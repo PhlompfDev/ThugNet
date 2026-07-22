@@ -1,0 +1,113 @@
+-- Indicator Light Graphics Element
+
+local util    = require("scada-common.util")
+
+local element = require("graphics.element")
+local flasher = require("graphics.flasher")
+
+---@class indicator_light_args
+---@field label string indicator label
+---@field colors cpair on/off colors (a/b respectively)
+---@field min_label_width? integer label length if omitted
+---@field flash? boolean whether to flash on true rather than stay on
+---@field period? PERIOD flash period
+---@field parent graphics_element
+---@field id? string element id
+---@field x? integer 1 if omitted
+---@field y? integer auto incremented if omitted
+---@field fg_bg? cpair foreground/background colors
+---@field hidden? boolean true to hide on initial draw
+
+-- Create a new indicator light element.
+---@nodiscard
+---@param args indicator_light_args
+---@return IndicatorLight element, element_id id
+return function (args)
+    element.assert(type(args.label) == "string", "label is a required field")
+    element.assert(type(args.colors) == "table", "colors is a required field")
+
+    if args.flash then
+        element.assert(util.is_int(args.period), "period is a required field if flash is enabled")
+    end
+
+    args.height = 1
+    args.width = math.max(args.min_label_width or 1, string.len(args.label)) + 2
+
+    local flash_on = true
+
+    -- create new graphics element base object
+    local e = element.new(args --[[@as graphics_args]])
+
+    e.value = false
+
+    -- called by flasher when enabled
+    local function flash_callback()
+        e.w_set_cur(1, 1)
+
+        if flash_on then
+            e.w_blit(" \x95", "0" .. args.colors.blit_a, args.colors.blit_a .. e.fg_bg.blit_bkg)
+        else
+            e.w_blit(" \x95", "0" .. args.colors.blit_b, args.colors.blit_b .. e.fg_bg.blit_bkg)
+        end
+
+        flash_on = not flash_on
+    end
+
+    -- enable light or start flashing
+    local function enable()
+        if args.flash then
+            flash_on = true
+            flasher.stop(flash_callback)   -- remove any existing copy before re-registering
+            flasher.start(flash_callback, args.period)
+        else
+            e.w_set_cur(1, 1)
+            e.w_blit(" \x95", "0" .. args.colors.blit_a, args.colors.blit_a .. e.fg_bg.blit_bkg)
+        end
+    end
+
+    -- disable light or stop flashing
+    local function disable()
+        if args.flash then
+            flash_on = false
+            flasher.stop(flash_callback)
+        end
+
+        e.w_set_cur(1, 1)
+        e.w_blit(" \x95", "0" .. args.colors.blit_b, args.colors.blit_b .. e.fg_bg.blit_bkg)
+    end
+
+    -- on state change
+    ---@param new_state boolean indicator state
+    function e.on_update(new_state)
+        e.value = new_state
+        if new_state then enable() else disable() end
+    end
+
+    -- set indicator state
+    ---@param val boolean indicator state
+    function e.set_value(val) e.on_update(val) end
+
+    -- change the on/off colors after construction and repaint (LED's twin;
+    -- kept in lockstep per the "LED and IndicatorLight are near-twins" lesson).
+    -- flash_callback/enable/disable read args.colors.blit_a/blit_b directly.
+    ---@param new_colors cpair new on/off colors
+    function e.recolor(new_colors)
+        args.colors = new_colors
+        e.on_update(e.value)
+    end
+
+    -- draw label and indicator light
+    function e.redraw()
+        -- e.value, not false: a redraw must not silently turn the light off. Any
+        -- ancestor redraw (an expiring alert toast repaints the whole display)
+        -- reaches every child, so this discarded live state. LED already did this.
+        e.on_update(e.value)
+        e.w_set_cur(3, 1)
+        e.w_write(args.label)
+    end
+
+    ---@class IndicatorLight:graphics_element
+    local IndicatorLight, id = e.complete(true)
+
+    return IndicatorLight, id
+end

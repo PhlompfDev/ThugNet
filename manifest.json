@@ -1,0 +1,540 @@
+{
+ "version": "2.1.0",
+ "files": [
+  {
+   "p": "CHANGELOG.md",
+   "n": 812,
+   "c": 3071743819
+  },
+  {
+   "p": "README.md",
+   "n": 9159,
+   "c": 331690480
+  },
+  {
+   "p": "graphics/context_menu.lua",
+   "n": 11108,
+   "c": 3106832894
+  },
+  {
+   "p": "graphics/core.lua",
+   "n": 10991,
+   "c": 3389438961
+  },
+  {
+   "p": "graphics/element.lua",
+   "n": 34755,
+   "c": 1426281851
+  },
+  {
+   "p": "graphics/elements/AppMultiPane.lua",
+   "n": 3966,
+   "c": 4261063251
+  },
+  {
+   "p": "graphics/elements/Box.lua",
+   "n": 8135,
+   "c": 2403479677
+  },
+  {
+   "p": "graphics/elements/ColorMap.lua",
+   "n": 983,
+   "c": 2501128807
+  },
+  {
+   "p": "graphics/elements/DisplayBox.lua",
+   "n": 895,
+   "c": 1077160224
+  },
+  {
+   "p": "graphics/elements/Div.lua",
+   "n": 3013,
+   "c": 3832391093
+  },
+  {
+   "p": "graphics/elements/HStack.lua",
+   "n": 5918,
+   "c": 3902945208
+  },
+  {
+   "p": "graphics/elements/ListBox.lua",
+   "n": 13051,
+   "c": 2225505590
+  },
+  {
+   "p": "graphics/elements/MultiPane.lua",
+   "n": 1509,
+   "c": 1468522488
+  },
+  {
+   "p": "graphics/elements/PipeNetwork.lua",
+   "n": 11638,
+   "c": 3924373640
+  },
+  {
+   "p": "graphics/elements/Rectangle.lua",
+   "n": 8586,
+   "c": 1876448710
+  },
+  {
+   "p": "graphics/elements/TextBox.lua",
+   "n": 3548,
+   "c": 3816042902
+  },
+  {
+   "p": "graphics/elements/Tiling.lua",
+   "n": 3033,
+   "c": 1185772814
+  },
+  {
+   "p": "graphics/elements/VStack.lua",
+   "n": 3811,
+   "c": 2159383701
+  },
+  {
+   "p": "graphics/elements/animations/Waiting.lua",
+   "n": 3332,
+   "c": 3011675656
+  },
+  {
+   "p": "graphics/elements/controls/App.lua",
+   "n": 4239,
+   "c": 528344194
+  },
+  {
+   "p": "graphics/elements/controls/Checkbox.lua",
+   "n": 3969,
+   "c": 369857893
+  },
+  {
+   "p": "graphics/elements/controls/DropBox.lua",
+   "n": 12170,
+   "c": 3350134511
+  },
+  {
+   "p": "graphics/elements/controls/HazardButton.lua",
+   "n": 6508,
+   "c": 1255687317
+  },
+  {
+   "p": "graphics/elements/controls/MultiButton.lua",
+   "n": 4751,
+   "c": 3861101817
+  },
+  {
+   "p": "graphics/elements/controls/NumericSpinbox.lua",
+   "n": 6367,
+   "c": 653943799
+  },
+  {
+   "p": "graphics/elements/controls/PushButton.lua",
+   "n": 7309,
+   "c": 2559091438
+  },
+  {
+   "p": "graphics/elements/controls/Radio2D.lua",
+   "n": 8029,
+   "c": 1554399291
+  },
+  {
+   "p": "graphics/elements/controls/RadioButton.lua",
+   "n": 5898,
+   "c": 3495553703
+  },
+  {
+   "p": "graphics/elements/controls/Sidebar.lua",
+   "n": 5320,
+   "c": 1319812525
+  },
+  {
+   "p": "graphics/elements/controls/SwitchButton.lua",
+   "n": 2801,
+   "c": 1940617351
+  },
+  {
+   "p": "graphics/elements/controls/TabBar.lua",
+   "n": 4324,
+   "c": 1439244388
+  },
+  {
+   "p": "graphics/elements/form/NumberField.lua",
+   "n": 9456,
+   "c": 3751330547
+  },
+  {
+   "p": "graphics/elements/form/TextField.lua",
+   "n": 3551,
+   "c": 1230782404
+  },
+  {
+   "p": "graphics/elements/indicators/AlarmLight.lua",
+   "n": 3890,
+   "c": 612200144
+  },
+  {
+   "p": "graphics/elements/indicators/CoreMap.lua",
+   "n": 4943,
+   "c": 3884545631
+  },
+  {
+   "p": "graphics/elements/indicators/DataIndicator.lua",
+   "n": 3167,
+   "c": 1363989729
+  },
+  {
+   "p": "graphics/elements/indicators/HorizontalBar.lua",
+   "n": 3889,
+   "c": 3963117170
+  },
+  {
+   "p": "graphics/elements/indicators/IconIndicator.lua",
+   "n": 2510,
+   "c": 1990596463
+  },
+  {
+   "p": "graphics/elements/indicators/IndicatorLight.lua",
+   "n": 3903,
+   "c": 1749466901
+  },
+  {
+   "p": "graphics/elements/indicators/LED.lua",
+   "n": 3983,
+   "c": 813749714
+  },
+  {
+   "p": "graphics/elements/indicators/LEDPair.lua",
+   "n": 3697,
+   "c": 3316797376
+  },
+  {
+   "p": "graphics/elements/indicators/PowerIndicator.lua",
+   "n": 2873,
+   "c": 1256490452
+  },
+  {
+   "p": "graphics/elements/indicators/RGBLED.lua",
+   "n": 1884,
+   "c": 4114566836
+  },
+  {
+   "p": "graphics/elements/indicators/RadIndicator.lua",
+   "n": 2930,
+   "c": 3533150651
+  },
+  {
+   "p": "graphics/elements/indicators/SignalBar.lua",
+   "n": 3005,
+   "c": 3747450097
+  },
+  {
+   "p": "graphics/elements/indicators/StateIndicator.lua",
+   "n": 2541,
+   "c": 2943231020
+  },
+  {
+   "p": "graphics/elements/indicators/TriIndicatorLight.lua",
+   "n": 3612,
+   "c": 1136931117
+  },
+  {
+   "p": "graphics/elements/indicators/VerticalBar.lua",
+   "n": 3098,
+   "c": 2357295406
+  },
+  {
+   "p": "graphics/events.lua",
+   "n": 8304,
+   "c": 307478414
+  },
+  {
+   "p": "graphics/flasher.lua",
+   "n": 4066,
+   "c": 2401893103
+  },
+  {
+   "p": "graphics/text_prompt.lua",
+   "n": 20923,
+   "c": 879358519
+  },
+  {
+   "p": "graphics/ui.lua",
+   "n": 16659,
+   "c": 2707672326
+  },
+  {
+   "p": "manifest.json",
+   "n": 8894,
+   "c": 174045177
+  },
+  {
+   "p": "scada-common/constants.lua",
+   "n": 3898,
+   "c": 1159229153
+  },
+  {
+   "p": "scada-common/log.lua",
+   "n": 10922,
+   "c": 1202672268
+  },
+  {
+   "p": "scada-common/tcd.lua",
+   "n": 2849,
+   "c": 393114659
+  },
+  {
+   "p": "scada-common/types.lua",
+   "n": 17532,
+   "c": 2695545492
+  },
+  {
+   "p": "scada-common/util.lua",
+   "n": 16566,
+   "c": 3178386282
+  },
+  {
+   "p": "setup.lua",
+   "n": 605,
+   "c": 1804324267
+  },
+  {
+   "p": "startup.lua",
+   "n": 9586,
+   "c": 3717886840
+  },
+  {
+   "p": "thugnet/config.lua",
+   "n": 3147,
+   "c": 161332831
+  },
+  {
+   "p": "thugnet/core/automation.lua",
+   "n": 7385,
+   "c": 737788538
+  },
+  {
+   "p": "thugnet/core/bus.lua",
+   "n": 3043,
+   "c": 3768499017
+  },
+  {
+   "p": "thugnet/core/checksum.lua",
+   "n": 872,
+   "c": 1956317775
+  },
+  {
+   "p": "thugnet/core/custom_pages.lua",
+   "n": 3978,
+   "c": 1653397386
+  },
+  {
+   "p": "thugnet/core/editor_store.lua",
+   "n": 3478,
+   "c": 1768312137
+  },
+  {
+   "p": "thugnet/core/events.lua",
+   "n": 2444,
+   "c": 1284174213
+  },
+  {
+   "p": "thugnet/core/rsio.lua",
+   "n": 1629,
+   "c": 3481991414
+  },
+  {
+   "p": "thugnet/core/scenes.lua",
+   "n": 5442,
+   "c": 2931142167
+  },
+  {
+   "p": "thugnet/core/sensor_probe.lua",
+   "n": 3055,
+   "c": 4084122702
+  },
+  {
+   "p": "thugnet/core/steps.lua",
+   "n": 6892,
+   "c": 3547372635
+  },
+  {
+   "p": "thugnet/core/store.lua",
+   "n": 1309,
+   "c": 1323870399
+  },
+  {
+   "p": "thugnet/core/telemetry.lua",
+   "n": 10309,
+   "c": 20505227
+  },
+  {
+   "p": "thugnet/core/updater.lua",
+   "n": 27330,
+   "c": 983478244
+  },
+  {
+   "p": "thugnet/kernel.lua",
+   "n": 2681,
+   "c": 2513440610
+  },
+  {
+   "p": "thugnet/migrate.lua",
+   "n": 14054,
+   "c": 624799940
+  },
+  {
+   "p": "thugnet/net/client.lua",
+   "n": 8332,
+   "c": 3417392614
+  },
+  {
+   "p": "thugnet/net/dns.lua",
+   "n": 9423,
+   "c": 532595945
+  },
+  {
+   "p": "thugnet/net/protocol.lua",
+   "n": 3242,
+   "c": 1280040024
+  },
+  {
+   "p": "thugnet/net/server.lua",
+   "n": 13879,
+   "c": 279704207
+  },
+  {
+   "p": "thugnet/net/transport.lua",
+   "n": 2997,
+   "c": 3750733076
+  },
+  {
+   "p": "thugnet/setup.lua",
+   "n": 7578,
+   "c": 3826134990
+  },
+  {
+   "p": "thugnet/ui/app.lua",
+   "n": 27301,
+   "c": 1911750265
+  },
+  {
+   "p": "thugnet/ui/editor/colors.lua",
+   "n": 1031,
+   "c": 676875990
+  },
+  {
+   "p": "thugnet/ui/editor/factory.lua",
+   "n": 16716,
+   "c": 3042469337
+  },
+  {
+   "p": "thugnet/ui/editor/props.lua",
+   "n": 10557,
+   "c": 1896301678
+  },
+  {
+   "p": "thugnet/ui/editor/wizard.lua",
+   "n": 8923,
+   "c": 3265981361
+  },
+  {
+   "p": "thugnet/ui/face_editor.lua",
+   "n": 8903,
+   "c": 3261759412
+  },
+  {
+   "p": "thugnet/ui/menus.lua",
+   "n": 12992,
+   "c": 745288071
+  },
+  {
+   "p": "thugnet/ui/nav.lua",
+   "n": 2265,
+   "c": 1481240130
+  },
+  {
+   "p": "thugnet/ui/pages/automation.lua",
+   "n": 7326,
+   "c": 474699496
+  },
+  {
+   "p": "thugnet/ui/pages/custom.lua",
+   "n": 9503,
+   "c": 215576597
+  },
+  {
+   "p": "thugnet/ui/pages/dashboard.lua",
+   "n": 5451,
+   "c": 1868873905
+  },
+  {
+   "p": "thugnet/ui/pages/displays.lua",
+   "n": 7773,
+   "c": 71895996
+  },
+  {
+   "p": "thugnet/ui/pages/dns.lua",
+   "n": 6295,
+   "c": 2887235111
+  },
+  {
+   "p": "thugnet/ui/pages/domains.lua",
+   "n": 5368,
+   "c": 865056086
+  },
+  {
+   "p": "thugnet/ui/pages/events.lua",
+   "n": 5514,
+   "c": 2942367609
+  },
+  {
+   "p": "thugnet/ui/pages/monitoring.lua",
+   "n": 10368,
+   "c": 1213210445
+  },
+  {
+   "p": "thugnet/ui/pages/scenes.lua",
+   "n": 10525,
+   "c": 1067571644
+  },
+  {
+   "p": "thugnet/ui/pages/server.lua",
+   "n": 3589,
+   "c": 1721441372
+  },
+  {
+   "p": "thugnet/ui/pages/server_config.lua",
+   "n": 33096,
+   "c": 1857205825
+  },
+  {
+   "p": "thugnet/ui/pages/settings.lua",
+   "n": 19141,
+   "c": 2258373486
+  },
+  {
+   "p": "thugnet/ui/panel.lua",
+   "n": 7289,
+   "c": 2899559604
+  },
+  {
+   "p": "thugnet/ui/setup_ui.lua",
+   "n": 9309,
+   "c": 2434791138
+  },
+  {
+   "p": "thugnet/ui/theme.lua",
+   "n": 2284,
+   "c": 1483320822
+  },
+  {
+   "p": "thugnet/ui/widgets.lua",
+   "n": 7275,
+   "c": 4064970609
+  },
+  {
+   "p": "thugnet/version.lua",
+   "n": 316,
+   "c": 1324903885
+  }
+ ]
+}
