@@ -1,0 +1,9 @@
+# Written by tools/publish.js -- do not hand-edit; changes here are
+# overwritten on the next release.
+#
+# This mirror ships LF-normalized bytes (see normalizeForPublish in
+# tools/publish.js). `-text` tells git to never touch line endings in this
+# repo again, on checkout or checkin, regardless of any machine's core.
+# autocrlf setting -- so the lengths/checksums in manifest.json can never
+# drift from what raw.githubusercontent.com serves.
+* -text

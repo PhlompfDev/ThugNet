@@ -2,349 +2,354 @@
  "version": "2.1.0",
  "files": [
   {
+   "p": ".gitattributes",
+   "n": 454,
+   "c": 75407518
+  },
+  {
    "p": "CHANGELOG.md",
-   "n": 812,
-   "c": 3071743819
+   "n": 793,
+   "c": 1594627668
   },
   {
    "p": "README.md",
-   "n": 9159,
-   "c": 331690480
+   "n": 8991,
+   "c": 874916200
   },
   {
    "p": "graphics/context_menu.lua",
-   "n": 11108,
-   "c": 3106832894
+   "n": 10845,
+   "c": 4253054115
   },
   {
    "p": "graphics/core.lua",
-   "n": 10991,
-   "c": 3389438961
+   "n": 10642,
+   "c": 2958993976
   },
   {
    "p": "graphics/element.lua",
-   "n": 34755,
-   "c": 1426281851
+   "n": 33808,
+   "c": 3584238948
   },
   {
    "p": "graphics/elements/AppMultiPane.lua",
-   "n": 3966,
-   "c": 4261063251
+   "n": 3859,
+   "c": 451323108
   },
   {
    "p": "graphics/elements/Box.lua",
-   "n": 8135,
-   "c": 2403479677
+   "n": 7973,
+   "c": 3371771971
   },
   {
    "p": "graphics/elements/ColorMap.lua",
-   "n": 983,
-   "c": 2501128807
+   "n": 948,
+   "c": 3373478048
   },
   {
    "p": "graphics/elements/DisplayBox.lua",
-   "n": 895,
-   "c": 1077160224
+   "n": 867,
+   "c": 2594318260
   },
   {
    "p": "graphics/elements/Div.lua",
-   "n": 3013,
-   "c": 3832391093
+   "n": 2940,
+   "c": 3764822528
   },
   {
    "p": "graphics/elements/HStack.lua",
-   "n": 5918,
-   "c": 3902945208
+   "n": 5780,
+   "c": 3320721590
   },
   {
    "p": "graphics/elements/ListBox.lua",
-   "n": 13051,
-   "c": 2225505590
+   "n": 12710,
+   "c": 3220927461
   },
   {
    "p": "graphics/elements/MultiPane.lua",
-   "n": 1509,
-   "c": 1468522488
+   "n": 1461,
+   "c": 3450199432
   },
   {
    "p": "graphics/elements/PipeNetwork.lua",
-   "n": 11638,
-   "c": 3924373640
+   "n": 11309,
+   "c": 2208374739
   },
   {
    "p": "graphics/elements/Rectangle.lua",
-   "n": 8586,
-   "c": 1876448710
+   "n": 8388,
+   "c": 3104328632
   },
   {
    "p": "graphics/elements/TextBox.lua",
-   "n": 3548,
-   "c": 3816042902
+   "n": 3440,
+   "c": 1848192026
   },
   {
    "p": "graphics/elements/Tiling.lua",
-   "n": 3033,
-   "c": 1185772814
+   "n": 2940,
+   "c": 2714792021
   },
   {
    "p": "graphics/elements/VStack.lua",
-   "n": 3811,
-   "c": 2159383701
+   "n": 3718,
+   "c": 1008635868
   },
   {
    "p": "graphics/elements/animations/Waiting.lua",
-   "n": 3332,
-   "c": 3011675656
+   "n": 3222,
+   "c": 2476245106
   },
   {
    "p": "graphics/elements/controls/App.lua",
-   "n": 4239,
-   "c": 528344194
+   "n": 4109,
+   "c": 2527780328
   },
   {
    "p": "graphics/elements/controls/Checkbox.lua",
-   "n": 3969,
-   "c": 369857893
+   "n": 3840,
+   "c": 3245706968
   },
   {
    "p": "graphics/elements/controls/DropBox.lua",
-   "n": 12170,
-   "c": 3350134511
+   "n": 11857,
+   "c": 2870931210
   },
   {
    "p": "graphics/elements/controls/HazardButton.lua",
-   "n": 6508,
-   "c": 1255687317
+   "n": 6303,
+   "c": 247937580
   },
   {
    "p": "graphics/elements/controls/MultiButton.lua",
-   "n": 4751,
-   "c": 3861101817
+   "n": 4618,
+   "c": 3210982968
   },
   {
    "p": "graphics/elements/controls/NumericSpinbox.lua",
-   "n": 6367,
-   "c": 653943799
+   "n": 6181,
+   "c": 2748865157
   },
   {
    "p": "graphics/elements/controls/PushButton.lua",
-   "n": 7309,
-   "c": 2559091438
+   "n": 7110,
+   "c": 2267125971
   },
   {
    "p": "graphics/elements/controls/Radio2D.lua",
-   "n": 8029,
-   "c": 1554399291
+   "n": 7828,
+   "c": 2360358406
   },
   {
    "p": "graphics/elements/controls/RadioButton.lua",
-   "n": 5898,
-   "c": 3495553703
+   "n": 5742,
+   "c": 160359099
   },
   {
    "p": "graphics/elements/controls/Sidebar.lua",
-   "n": 5320,
-   "c": 1319812525
+   "n": 5147,
+   "c": 3836458212
   },
   {
    "p": "graphics/elements/controls/SwitchButton.lua",
-   "n": 2801,
-   "c": 1940617351
+   "n": 2722,
+   "c": 2326492292
   },
   {
    "p": "graphics/elements/controls/TabBar.lua",
-   "n": 4324,
-   "c": 1439244388
+   "n": 4197,
+   "c": 580786673
   },
   {
    "p": "graphics/elements/form/NumberField.lua",
-   "n": 9456,
-   "c": 3751330547
+   "n": 9201,
+   "c": 2901390848
   },
   {
    "p": "graphics/elements/form/TextField.lua",
-   "n": 3551,
-   "c": 1230782404
+   "n": 3447,
+   "c": 513292924
   },
   {
    "p": "graphics/elements/indicators/AlarmLight.lua",
-   "n": 3890,
-   "c": 612200144
+   "n": 3770,
+   "c": 4055066808
   },
   {
    "p": "graphics/elements/indicators/CoreMap.lua",
-   "n": 4943,
-   "c": 3884545631
+   "n": 4771,
+   "c": 886533539
   },
   {
    "p": "graphics/elements/indicators/DataIndicator.lua",
-   "n": 3167,
-   "c": 1363989729
+   "n": 3066,
+   "c": 582209472
   },
   {
    "p": "graphics/elements/indicators/HorizontalBar.lua",
-   "n": 3889,
-   "c": 3963117170
+   "n": 3763,
+   "c": 3914553356
   },
   {
    "p": "graphics/elements/indicators/IconIndicator.lua",
-   "n": 2510,
-   "c": 1990596463
+   "n": 2432,
+   "c": 3533312889
   },
   {
    "p": "graphics/elements/indicators/IndicatorLight.lua",
-   "n": 3903,
-   "c": 1749466901
+   "n": 3790,
+   "c": 1218885976
   },
   {
    "p": "graphics/elements/indicators/LED.lua",
-   "n": 3983,
-   "c": 813749714
+   "n": 3864,
+   "c": 1122357191
   },
   {
    "p": "graphics/elements/indicators/LEDPair.lua",
-   "n": 3697,
-   "c": 3316797376
+   "n": 3585,
+   "c": 1077824016
   },
   {
    "p": "graphics/elements/indicators/PowerIndicator.lua",
-   "n": 2873,
-   "c": 1256490452
+   "n": 2784,
+   "c": 3544351055
   },
   {
    "p": "graphics/elements/indicators/RGBLED.lua",
-   "n": 1884,
-   "c": 4114566836
+   "n": 1825,
+   "c": 4125182901
   },
   {
    "p": "graphics/elements/indicators/RadIndicator.lua",
-   "n": 2930,
-   "c": 3533150651
+   "n": 2840,
+   "c": 2400752937
   },
   {
    "p": "graphics/elements/indicators/SignalBar.lua",
-   "n": 3005,
-   "c": 3747450097
+   "n": 2922,
+   "c": 293832890
   },
   {
    "p": "graphics/elements/indicators/StateIndicator.lua",
-   "n": 2541,
-   "c": 2943231020
+   "n": 2460,
+   "c": 2729975823
   },
   {
    "p": "graphics/elements/indicators/TriIndicatorLight.lua",
-   "n": 3612,
-   "c": 1136931117
+   "n": 3503,
+   "c": 788409252
   },
   {
    "p": "graphics/elements/indicators/VerticalBar.lua",
-   "n": 3098,
-   "c": 2357295406
+   "n": 2993,
+   "c": 3047453657
   },
   {
    "p": "graphics/events.lua",
-   "n": 8304,
-   "c": 307478414
+   "n": 8050,
+   "c": 2131014312
   },
   {
    "p": "graphics/flasher.lua",
-   "n": 4066,
-   "c": 2401893103
+   "n": 3930,
+   "c": 1135473671
   },
   {
    "p": "graphics/text_prompt.lua",
-   "n": 20923,
-   "c": 879358519
+   "n": 20356,
+   "c": 3337672044
   },
   {
    "p": "graphics/ui.lua",
-   "n": 16659,
-   "c": 2707672326
+   "n": 16346,
+   "c": 555072801
   },
   {
    "p": "manifest.json",
-   "n": 8894,
-   "c": 174045177
+   "n": 8962,
+   "c": 2977744635
   },
   {
    "p": "scada-common/constants.lua",
-   "n": 3898,
-   "c": 1159229153
+   "n": 3777,
+   "c": 2367121596
   },
   {
    "p": "scada-common/log.lua",
-   "n": 10922,
-   "c": 1202672268
+   "n": 10563,
+   "c": 2532261969
   },
   {
    "p": "scada-common/tcd.lua",
-   "n": 2849,
-   "c": 393114659
+   "n": 2763,
+   "c": 2123657157
   },
   {
    "p": "scada-common/types.lua",
-   "n": 17532,
-   "c": 2695545492
+   "n": 16864,
+   "c": 4200505512
   },
   {
    "p": "scada-common/util.lua",
-   "n": 16566,
-   "c": 3178386282
+   "n": 15997,
+   "c": 111425157
   },
   {
    "p": "setup.lua",
-   "n": 605,
-   "c": 1804324267
+   "n": 594,
+   "c": 3874868508
   },
   {
    "p": "startup.lua",
-   "n": 9586,
-   "c": 3717886840
+   "n": 9373,
+   "c": 1005676711
   },
   {
    "p": "thugnet/config.lua",
-   "n": 3147,
-   "c": 161332831
+   "n": 3056,
+   "c": 591772096
   },
   {
    "p": "thugnet/core/automation.lua",
-   "n": 7385,
-   "c": 737788538
+   "n": 7186,
+   "c": 1985787999
   },
   {
    "p": "thugnet/core/bus.lua",
-   "n": 3043,
-   "c": 3768499017
+   "n": 2944,
+   "c": 2386998850
   },
   {
    "p": "thugnet/core/checksum.lua",
-   "n": 872,
-   "c": 1956317775
+   "n": 847,
+   "c": 3855747338
   },
   {
    "p": "thugnet/core/custom_pages.lua",
-   "n": 3978,
-   "c": 1653397386
+   "n": 3863,
+   "c": 1174131123
   },
   {
    "p": "thugnet/core/editor_store.lua",
-   "n": 3478,
-   "c": 1768312137
+   "n": 3382,
+   "c": 326977641
   },
   {
    "p": "thugnet/core/events.lua",
-   "n": 2444,
-   "c": 1284174213
+   "n": 2366,
+   "c": 1015541135
   },
   {
    "p": "thugnet/core/rsio.lua",
-   "n": 1629,
-   "c": 3481991414
+   "n": 1573,
+   "c": 1142486558
   },
   {
    "p": "thugnet/core/scenes.lua",
-   "n": 5442,
-   "c": 2931142167
+   "n": 5268,
+   "c": 2665522497
   },
   {
    "p": "thugnet/core/sensor_probe.lua",
@@ -353,183 +358,183 @@
   },
   {
    "p": "thugnet/core/steps.lua",
-   "n": 6892,
-   "c": 3547372635
+   "n": 6692,
+   "c": 2187694643
   },
   {
    "p": "thugnet/core/store.lua",
-   "n": 1309,
-   "c": 1323870399
+   "n": 1276,
+   "c": 4136544018
   },
   {
    "p": "thugnet/core/telemetry.lua",
-   "n": 10309,
-   "c": 20505227
+   "n": 10038,
+   "c": 4108375240
   },
   {
    "p": "thugnet/core/updater.lua",
-   "n": 27330,
-   "c": 983478244
+   "n": 26711,
+   "c": 876384373
   },
   {
    "p": "thugnet/kernel.lua",
-   "n": 2681,
-   "c": 2513440610
+   "n": 2588,
+   "c": 3112438441
   },
   {
    "p": "thugnet/migrate.lua",
-   "n": 14054,
-   "c": 624799940
+   "n": 13755,
+   "c": 3269108117
   },
   {
    "p": "thugnet/net/client.lua",
-   "n": 8332,
-   "c": 3417392614
+   "n": 8076,
+   "c": 3202562278
   },
   {
    "p": "thugnet/net/dns.lua",
-   "n": 9423,
-   "c": 532595945
+   "n": 9182,
+   "c": 1338620076
   },
   {
    "p": "thugnet/net/protocol.lua",
-   "n": 3242,
-   "c": 1280040024
+   "n": 3163,
+   "c": 961861717
   },
   {
    "p": "thugnet/net/server.lua",
-   "n": 13879,
-   "c": 279704207
+   "n": 13506,
+   "c": 3776044958
   },
   {
    "p": "thugnet/net/transport.lua",
-   "n": 2997,
-   "c": 3750733076
+   "n": 2914,
+   "c": 1884004573
   },
   {
    "p": "thugnet/setup.lua",
-   "n": 7578,
-   "c": 3826134990
+   "n": 7404,
+   "c": 1150494456
   },
   {
    "p": "thugnet/ui/app.lua",
-   "n": 27301,
-   "c": 1911750265
+   "n": 26667,
+   "c": 3683704391
   },
   {
    "p": "thugnet/ui/editor/colors.lua",
-   "n": 1031,
-   "c": 676875990
+   "n": 1000,
+   "c": 1447513411
   },
   {
    "p": "thugnet/ui/editor/factory.lua",
-   "n": 16716,
-   "c": 3042469337
+   "n": 16374,
+   "c": 1045517435
   },
   {
    "p": "thugnet/ui/editor/props.lua",
-   "n": 10557,
-   "c": 1896301678
+   "n": 10318,
+   "c": 3620091979
   },
   {
    "p": "thugnet/ui/editor/wizard.lua",
-   "n": 8923,
-   "c": 3265981361
+   "n": 8681,
+   "c": 1089331047
   },
   {
    "p": "thugnet/ui/face_editor.lua",
-   "n": 8903,
-   "c": 3261759412
+   "n": 8681,
+   "c": 634614894
   },
   {
    "p": "thugnet/ui/menus.lua",
-   "n": 12992,
-   "c": 745288071
+   "n": 12702,
+   "c": 2938643149
   },
   {
    "p": "thugnet/ui/nav.lua",
-   "n": 2265,
-   "c": 1481240130
+   "n": 2199,
+   "c": 1874062056
   },
   {
    "p": "thugnet/ui/pages/automation.lua",
-   "n": 7326,
-   "c": 474699496
+   "n": 7181,
+   "c": 3919597451
   },
   {
    "p": "thugnet/ui/pages/custom.lua",
-   "n": 9503,
-   "c": 215576597
+   "n": 9319,
+   "c": 2978571965
   },
   {
    "p": "thugnet/ui/pages/dashboard.lua",
-   "n": 5451,
-   "c": 1868873905
+   "n": 5326,
+   "c": 650558040
   },
   {
    "p": "thugnet/ui/pages/displays.lua",
-   "n": 7773,
-   "c": 71895996
+   "n": 7604,
+   "c": 1665532711
   },
   {
    "p": "thugnet/ui/pages/dns.lua",
-   "n": 6295,
-   "c": 2887235111
+   "n": 6159,
+   "c": 991014719
   },
   {
    "p": "thugnet/ui/pages/domains.lua",
-   "n": 5368,
-   "c": 865056086
+   "n": 5251,
+   "c": 654946149
   },
   {
    "p": "thugnet/ui/pages/events.lua",
-   "n": 5514,
-   "c": 2942367609
+   "n": 5382,
+   "c": 1696657605
   },
   {
    "p": "thugnet/ui/pages/monitoring.lua",
-   "n": 10368,
-   "c": 1213210445
+   "n": 10166,
+   "c": 2265126155
   },
   {
    "p": "thugnet/ui/pages/scenes.lua",
-   "n": 10525,
-   "c": 1067571644
+   "n": 10308,
+   "c": 2944388791
   },
   {
    "p": "thugnet/ui/pages/server.lua",
-   "n": 3589,
-   "c": 1721441372
+   "n": 3508,
+   "c": 2448234559
   },
   {
    "p": "thugnet/ui/pages/server_config.lua",
-   "n": 33096,
-   "c": 1857205825
+   "n": 32424,
+   "c": 1024496673
   },
   {
    "p": "thugnet/ui/pages/settings.lua",
-   "n": 19141,
-   "c": 2258373486
+   "n": 18763,
+   "c": 1546582061
   },
   {
    "p": "thugnet/ui/panel.lua",
-   "n": 7289,
-   "c": 2899559604
+   "n": 7134,
+   "c": 1730264277
   },
   {
    "p": "thugnet/ui/setup_ui.lua",
-   "n": 9309,
-   "c": 2434791138
+   "n": 9118,
+   "c": 1013640495
   },
   {
    "p": "thugnet/ui/theme.lua",
-   "n": 2284,
-   "c": 1483320822
+   "n": 2215,
+   "c": 1170319989
   },
   {
    "p": "thugnet/ui/widgets.lua",
-   "n": 7275,
-   "c": 4064970609
+   "n": 7132,
+   "c": 3954802734
   },
   {
    "p": "thugnet/version.lua",
