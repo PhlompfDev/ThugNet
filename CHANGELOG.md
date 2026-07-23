@@ -3,6 +3,10 @@
 Newest first. The Settings > Updates tab reads this file, showing the
 sections newer than the version a node currently runs.
 
+## v2.2.5
+
+- Adds spacing on the Settings page between the header and tabs, around the Feature Request button, and between the role checkboxes.
+
 ## v2.2.4
 
 - Makes the Settings update button's label readable while it is greyed out.

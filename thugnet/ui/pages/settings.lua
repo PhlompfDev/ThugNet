@@ -12,7 +12,9 @@ return {
     name = "Settings",
     category = "system",
     min_w = 26,
-    min_h = 12,
+    -- Updates tab bottoms out at row 15 plus the hint line (request 004's
+    -- padding); anything shorter clips checkboxes instead of refusing
+    min_h = 16,
     requires_role = "ui",
     build = function(content, ui_ctx)
         local theme = ui_ctx.theme
@@ -21,6 +23,8 @@ return {
         local view = bus.get("settings_tab") or "Updates"
 
         local y = widgets.section(content, 2, 1, w - 2, "SETTINGS", theme)
+        y = y + 1 -- blank row: the header's accent tick must not touch the
+                  -- highlighted tab below it (request 004)
 
         -- tab strip
         local tx = 2
@@ -202,7 +206,7 @@ return {
             -- the agent loop watches -- and this updater carries the result
             -- back to every node once the owner merges and publishes.
             ui.PushButton{
-                parent = content, x = 2, y = y + 6, width = 17,
+                parent = content, x = 2, y = y + 7, width = 17,
                 text = "Feature Request",
                 fg_bg = ui.cpair(theme.tokens.text, theme.tokens.raised),
                 active_fg_bg = ui.cpair(theme.tokens.bg, theme.tokens.accent),
@@ -210,14 +214,14 @@ return {
             }
 
             ui.Checkbox{
-                parent = content, x = 2, y = y + 8, label = "Notify me about updates",
+                parent = content, x = 2, y = y + 9, label = "Notify me about updates",
                 box_fg_bg = ui.cpair(theme.tokens.accent, theme.tokens.raised),
                 fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.bg),
                 default = bus.get("update_notify") ~= false,
                 callback = function(v) bus.set("update_notify", v, { persist = true }) end,
             }
             ui.Checkbox{
-                parent = content, x = 2, y = y + 9,
+                parent = content, x = 2, y = y + 10,
                 label = "Auto-install and reboot when idle",
                 box_fg_bg = ui.cpair(theme.tokens.accent, theme.tokens.raised),
                 fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.bg),
@@ -369,7 +373,8 @@ return {
             for i, r in ipairs(ROLES) do
                 local box
                 box = ui.Checkbox{
-                    parent = content, x = 2, y = y + i - 1, label = r.label,
+                    -- one blank row between each role box (request 004)
+                    parent = content, x = 2, y = y + (i - 1) * 2, label = r.label,
                     box_fg_bg = ui.cpair(theme.tokens.accent, theme.tokens.raised),
                     fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.bg),
                     default = cfg.roles[r.key] == true,
@@ -385,7 +390,7 @@ return {
                     end,
                 }
             end
-            ui.TextBox{ parent = content, x = 2, y = y + #ROLES + 1, width = w - 3,
+            ui.TextBox{ parent = content, x = 2, y = y + #ROLES * 2, width = w - 3,
                 height = 2, text = "Role changes take effect after a reboot "
                     .. "(Node tab).",
                 fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.bg) }
