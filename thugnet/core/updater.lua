@@ -26,7 +26,12 @@ updater.ATTEMPT_MARKER = ".tn_pending_boot.attempt"
 updater.INSTALLED  = "installed_manifest.json"
 
 local HTTP_TIMEOUT = 30
+local MAX_ATTEMPTS = 3       -- per-fetch attempts before giving up (download + check)
+local RETRY_BACKOFF = 2      -- seconds; delay before retry N = RETRY_BACKOFF * 2^(N-1)
 
+local function backoff_delay(attempt) return RETRY_BACKOFF * 2 ^ (attempt - 1) end
+
+local throttle_secs = 0.3 -- seconds between staged-download files (set in init)
 local D = {}              -- injected deps
 local S = { state = "idle", done = 0, total = 0 }
 local pending = {}        -- url -> { cbs = {cb, ...}, timer }
@@ -204,14 +209,42 @@ end
 
 updater.fetch = fetch   -- Task 10's changelog view reuses this
 
+-- fetch with bounded retry+backoff, for the callers where a transient stall
+-- should not be fatal (the manifest check here; each staged file has its own
+-- inline retry because it also re-verifies size/checksum). The changelog view
+-- keeps plain single-shot `fetch` -- an on-demand button should fail fast, not
+-- hang through retries.
+---@param url string
+---@param attempt integer 1-based
+---@param cb fun(body:string|nil, err:string|nil)
+local function fetch_retry(url, attempt, cb)
+    fetch(url, function(body, err)
+        if err and attempt < MAX_ATTEMPTS then
+            if D.events then
+                D.events.log("warn", "update",
+                    "retrying manifest (" .. attempt .. "/" .. MAX_ATTEMPTS .. "): " .. err)
+            end
+            D.kernel.after(backoff_delay(attempt), function()
+                fetch_retry(url, attempt + 1, cb)
+            end)
+            return
+        end
+        cb(body, err)   -- success at some attempt, OR exhausted with the last err
+    end)
+end
+
 -- ── init ─────────────────────────────────────────────────────────────────
----@param deps table { kernel, store, bus, events, version? }
+---@param deps table { kernel, store, bus, events, version?, throttle_secs? }
 function updater.init(deps)
     D = deps
     S = { state = "idle", done = 0, total = 0 }
     pending = {}
     expired = {}
     S.installed = deps.version or require("thugnet.version")
+    -- inter-file download spacing; production leaves it at the 0.3s default,
+    -- tests pass 0 for synchronous determinism. An explicit 0 must win (0 is
+    -- truthy in Lua, so guard on nil rather than `or`).
+    if deps.throttle_secs ~= nil then throttle_secs = deps.throttle_secs end
     -- Tests call kernel.reset() (which wipes kernel.lua's ev_handlers) and
     -- then re-init() to get a clean S/pending for the next scenario. wire()
     -- re-registers against whichever kernel is live now, cancelling its own
@@ -240,7 +273,7 @@ function updater.check(cb)
         return
     end
     set_state("checking")
-    fetch(updater.BASE .. "manifest.json", function(body, err)
+    fetch_retry(updater.BASE .. "manifest.json", 1, function(body, err)
         if err then
             set_state("error", err)
             if D.events then D.events.log("warn", "update", "check failed: " .. err) end
@@ -384,7 +417,70 @@ function updater.download(cb)
         if cb then cb(S.state) end
     end
 
-    local function next_file(i)
+    local next_file   -- forward decl (attempt_file <-> next_file)
+
+    -- Space successive file requests apart so a burst doesn't trip the
+    -- server-side rate limit in the first place (the per-file retry is the
+    -- safety net for when one still stalls). throttle_secs == 0 (tests) steps
+    -- synchronously, preserving the deterministic one-request-at-a-time flow.
+    local function step_next(i)
+        -- Only throttle before an actual file fetch; stepping past the end
+        -- (into "staged") is immediate -- no trailing delay after the last file.
+        if i <= #files and throttle_secs and throttle_secs > 0 then
+            D.kernel.after(throttle_secs, function() next_file(i) end)
+        else
+            next_file(i)
+        end
+    end
+
+    -- One file, with bounded retry+backoff. A transient failure (fetch
+    -- timeout/error, wrong size, or a stale-edge checksum mismatch) is retried
+    -- up to MAX_ATTEMPTS before the whole download aborts. A write failure is
+    -- NOT retried -- a disk problem won't fix itself, so it aborts at once.
+    local function attempt_file(i, attempt)
+        local f = files[i]
+        fetch(updater.BASE .. f.p, function(body, err)
+            -- `err or ...` short-circuits: when err is set (body is nil on a
+            -- timeout/failure), the size/checksum checks are never evaluated,
+            -- so `#body` is never taken on a nil body.
+            local reason = err
+                or (#body ~= f.n and "wrong size")
+                or (checksum.sum(body) ~= f.c and "checksum mismatch")
+                or nil
+            if reason then
+                if attempt < MAX_ATTEMPTS then
+                    if D.events then
+                        D.events.log("warn", "update",
+                            "retrying " .. f.p .. " (" .. attempt .. "/" .. MAX_ATTEMPTS
+                            .. "): " .. reason)
+                    end
+                    D.kernel.after(backoff_delay(attempt), function()
+                        attempt_file(i, attempt + 1)
+                    end)
+                else
+                    abort(f.p .. ": " .. reason)
+                end
+                return
+            end
+            -- verified OK; the write can still throw (fs.makeDir/f.write/f.close,
+            -- e.g. CC's "Out of space" even after the preflight). That throw is
+            -- NOT retryable -- catch it here and funnel to abort() so it can't
+            -- escape into dispatch_cbs's pcall and strand S.state at
+            -- "downloading" until the next reboot.
+            local ok, threw = pcall(function()
+                if not write_file(updater.staged_path(f.p), body) then
+                    return abort(f.p .. ": cannot write")
+                end
+                S.done = i
+                step_next(i + 1)
+            end)
+            if not ok then
+                abort(f.p .. ": " .. tostring(threw))
+            end
+        end)
+    end
+
+    function next_file(i)
         if i > #files then
             set_state("staged")
             if D.events then
@@ -393,36 +489,7 @@ function updater.download(cb)
             if cb then cb(S.state) end
             return
         end
-        local f = files[i]
-        fetch(updater.BASE .. f.p, function(body, err)
-            -- The callback body is wrapped in its own pcall: write_file can
-            -- throw (fs.makeDir/f.write/f.close, e.g. "Out of space" even
-            -- after the preflight above -- estimates can still be wrong, or
-            -- something else fills the disk mid-download). Any throw here
-            -- would otherwise escape into dispatch_cbs's pcall, which just
-            -- logs and returns -- next_file() is never called and S.state
-            -- is stranded at "downloading" until the next reboot. Catching
-            -- it here and funnelling it through abort() keeps the existing
-            -- abort behaviour (discard stage, error state, log) on this
-            -- path too.
-            local ok, threw = pcall(function()
-                if err then return abort(f.p .. ": " .. err) end
-                if #body ~= f.n then
-                    return abort(f.p .. ": wrong size")
-                end
-                if checksum.sum(body) ~= f.c then
-                    return abort(f.p .. ": checksum mismatch")
-                end
-                if not write_file(updater.staged_path(f.p), body) then
-                    return abort(f.p .. ": cannot write")
-                end
-                S.done = i
-                next_file(i + 1)
-            end)
-            if not ok then
-                abort(f.p .. ": " .. tostring(threw))
-            end
-        end)
+        attempt_file(i, 1)
     end
 
     next_file(1)

@@ -3,6 +3,10 @@
 Newest first. The Settings > Updates tab reads this file, showing the
 sections newer than the version a node currently runs.
 
+## v2.2.8
+
+- Updates are more resilient: a file that briefly stalls while downloading is now retried instead of failing the whole update, and requests are paced to avoid rate-limit stalls.
+
 ## v2.2.7
 
 - Monitoring page now removes sensors when they are deleted and stays in sync as sensors are added or changed. Offline sensors still appear (shown as down); a new right-click "Forget sensor" option clears a lingering one.
