@@ -109,7 +109,10 @@ return {
                     text = label:sub(1, w - 7),
                     fg_bg = rest,
                     active_fg_bg = ui.cpair(theme.tokens.bg, theme.tokens.accent),
-                    dis_fg_bg = ui.cpair(theme.tokens.raised, theme.tokens.panel),
+                    -- dim, not raised: raised-on-panel is dark-on-dark and the
+                    -- disabled label ("Not checked yet", "Up to date", ...)
+                    -- was unreadable on a monitor (request 003)
+                    dis_fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.panel),
                     callback = function()
                         local cur = updater.status().state
                         if cur == "available" then
