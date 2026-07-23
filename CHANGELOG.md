@@ -3,6 +3,11 @@
 Newest first. The Settings > Updates tab reads this file, showing the
 sections newer than the version a node currently runs.
 
+## v2.2.10
+
+- The update screen now shows live progress: the file currently downloading, a fill bar, and how far along the download is -- instead of sitting at 0/x until it finishes.
+- If a file stalls, the screen now shows the retry (e.g. "retry 2/3") as it happens, so a slow update no longer looks frozen.
+
 ## v2.2.9
 
 - Home page DNS and Server dots now show live status: they pulse green while the service is up and turn solid red when it is down (stopping the server now turns its dot red instead of staying green).

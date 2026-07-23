@@ -1,10 +1,10 @@
 {
- "version": "2.2.9",
+ "version": "2.2.10",
  "files": [
   {
    "p": "CHANGELOG.md",
-   "n": 3106,
-   "c": 3844223763
+   "n": 3416,
+   "c": 599432267
   },
   {
    "p": "README.md",
@@ -368,8 +368,8 @@
   },
   {
    "p": "thugnet/core/updater.lua",
-   "n": 37904,
-   "c": 1504274290
+   "n": 38875,
+   "c": 2505610135
   },
   {
    "p": "thugnet/kernel.lua",
@@ -518,8 +518,8 @@
   },
   {
    "p": "thugnet/ui/pages/settings.lua",
-   "n": 22421,
-   "c": 4136903102
+   "n": 24949,
+   "c": 3245135525
   },
   {
    "p": "thugnet/ui/panel.lua",
@@ -543,8 +543,8 @@
   },
   {
    "p": "thugnet/version.lua",
-   "n": 316,
-   "c": 1327001047
+   "n": 317,
+   "c": 3174264319
   }
  ]
 }

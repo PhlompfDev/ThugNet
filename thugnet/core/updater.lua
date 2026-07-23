@@ -83,13 +83,32 @@ local function set_state(state, reason)
     end
     S.state = state
     S.reason = reason
+    if state ~= "downloading" then
+        S.file, S.attempt, S.retrying = nil, nil, false
+    end
     if D.bus then D.bus.set("update_state", state) end
 end
 
----@return table { state, installed, latest, done, total, reason }
+-- Mirror per-file download progress onto the bus so the Settings page can
+-- repaint mid-download. The state stays "downloading" the whole time, so
+-- set_state (which drives update_state) never fires per file -- this is the
+-- companion signal that does. Reporting only: a plain bus write, never throws
+-- into the fetch callback path.
+local function set_progress()
+    if D.bus then
+        D.bus.set("update_progress", {
+            i = S.done, total = S.total, file = S.file,
+            attempt = S.attempt, max = MAX_ATTEMPTS, retrying = S.retrying,
+        })
+    end
+end
+
+---@return table { state, installed, latest, done, total, reason, file, attempt, max, retrying }
 function updater.status()
     return { state = S.state, installed = S.installed, latest = S.latest,
-             done = S.done, total = S.total, reason = S.reason }
+             done = S.done, total = S.total, reason = S.reason,
+             file = S.file, attempt = S.attempt, max = MAX_ATTEMPTS,
+             retrying = S.retrying }
 end
 
 -- ── async fetch ──────────────────────────────────────────────────────────
@@ -439,6 +458,8 @@ function updater.download(cb)
     -- NOT retried -- a disk problem won't fix itself, so it aborts at once.
     local function attempt_file(i, attempt)
         local f = files[i]
+        S.file, S.attempt, S.retrying = f.p, attempt, false
+        set_progress()
         fetch(updater.BASE .. f.p, function(body, err)
             -- `err or ...` short-circuits: when err is set (body is nil on a
             -- timeout/failure), the size/checksum checks are never evaluated,
@@ -449,6 +470,8 @@ function updater.download(cb)
                 or nil
             if reason then
                 if attempt < MAX_ATTEMPTS then
+                    S.retrying = true
+                    set_progress()
                     if D.events then
                         D.events.log("warn", "update",
                             "retrying " .. f.p .. " (" .. attempt .. "/" .. MAX_ATTEMPTS

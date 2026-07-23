@@ -69,7 +69,7 @@ return {
                 if pulse_fn then flasher.stop(pulse_fn); pulse_fn = nil end
             end
 
-            local render_button
+            local render_button, render_progress
             render_button = function()
                 stop_pulse()
                 slot.remove_all()
@@ -151,6 +151,43 @@ return {
 
             render_button()
 
+            -- Live per-file progress: a fill bar (done/total) on the left and a
+            -- detail line naming the file in flight (or its retry status) on the
+            -- right of the row below the button. Persistent elements repainted in
+            -- place -- NOT rebuilt -- so mid-download updates don't flicker.
+            local prog_bar = ui.HorizontalBar{
+                parent = content, x = 2, y = y + 4, width = 12, height = 1,
+                fg_bg = ui.cpair(theme.tokens.ok, theme.tokens.raised),
+            }
+            local detail_tb = ui.TextBox{
+                parent = content, x = 15, y = y + 4, width = w - 16, height = 1,
+                text = "", fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.bg),
+            }
+            render_progress = function()
+                local s = updater.status()
+                if s.state == "downloading" then
+                    local total = s.total or 0
+                    prog_bar.set_value(total > 0 and (s.done or 0) / total or 0)
+                    local base = s.file and (tostring(s.file):match("[^/]+$")
+                                             or tostring(s.file)) or ""
+                    if s.retrying then
+                        -- TextBox.recolor takes a single fg color (not a cpair);
+                        -- the bg stays the theme bg it was built with.
+                        detail_tb.recolor(theme.tokens.alert)
+                        detail_tb.set_value(base ~= "" and
+                            ("\x1a " .. base .. " - retry " .. tostring(s.attempt or 1)
+                             .. "/" .. tostring(s.max or 1)) or "")
+                    else
+                        detail_tb.recolor(theme.tokens.dim)
+                        detail_tb.set_value(base ~= "" and ("\x1a " .. base) or "")
+                    end
+                else
+                    prog_bar.set_value(0)
+                    detail_tb.set_value("")
+                end
+            end
+            render_progress()
+
             -- The button must repaint from state changes it did NOT itself
             -- cause -- e.g. the scheduled 30-second/30-minute poll finding
             -- an update while this page is already open, or a download's
@@ -162,10 +199,17 @@ return {
             -- exists for. The updater already mirrors every state change
             -- onto the "update_state" bus key (see set_state() in
             -- updater.lua); bus.watch is the natural way to ride along.
-            local update_watch = bus.watch("update_state", function() render_button() end)
+            -- update_state fires on transitions (drives the button label/pulse);
+            -- update_progress fires per file/retry (drives the count + detail
+            -- row). Both repaint both, so the N/M count advances live and the
+            -- detail row clears the instant the download leaves "downloading".
+            local function refresh() render_button(); render_progress() end
+            local update_watch = bus.watch("update_state", refresh)
+            local progress_watch = bus.watch("update_progress", refresh)
             ui_ctx.own({ cancel = function()
                 stop_pulse()
                 if update_watch then update_watch.cancel() end
+                if progress_watch then progress_watch.cancel() end
             end })
 
             ui.PushButton{
