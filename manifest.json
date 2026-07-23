@@ -1,5 +1,5 @@
 {
- "version": "2.2.2",
+ "version": "2.2.3",
  "files": [
   {
    "p": "CHANGELOG.md",
@@ -544,7 +544,7 @@
   {
    "p": "thugnet/version.lua",
    "n": 316,
-   "c": 1325624784
+   "c": 1325821393
   }
  ]
 }
