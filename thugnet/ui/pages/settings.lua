@@ -142,7 +142,23 @@ return {
             end
 
             render_button()
-            ui_ctx.own({ cancel = stop_pulse })
+
+            -- The button must repaint from state changes it did NOT itself
+            -- cause -- e.g. the scheduled 30-second/30-minute poll finding
+            -- an update while this page is already open, or a download's
+            -- progress advancing in the background. render_button() was
+            -- previously only ever re-invoked from this page's own button
+            -- callbacks, so a state change from anywhere else (the poll)
+            -- left the button showing "Not checked yet" and disabled --
+            -- the owner had no way to click the very button the feature
+            -- exists for. The updater already mirrors every state change
+            -- onto the "update_state" bus key (see set_state() in
+            -- updater.lua); bus.watch is the natural way to ride along.
+            local update_watch = bus.watch("update_state", function() render_button() end)
+            ui_ctx.own({ cancel = function()
+                stop_pulse()
+                if update_watch then update_watch.cancel() end
+            end })
 
             ui.PushButton{
                 parent = content, x = 2, y = y + 5, width = 13, text = "Check Now",

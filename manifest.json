@@ -2,11 +2,6 @@
  "version": "2.1.0",
  "files": [
   {
-   "p": ".gitattributes",
-   "n": 454,
-   "c": 75407518
-  },
-  {
    "p": "CHANGELOG.md",
    "n": 793,
    "c": 1594627668
@@ -368,8 +363,8 @@
   },
   {
    "p": "thugnet/core/updater.lua",
-   "n": 26711,
-   "c": 876384373
+   "n": 33958,
+   "c": 4244677169
   },
   {
    "p": "thugnet/kernel.lua",
@@ -508,8 +503,8 @@
   },
   {
    "p": "thugnet/ui/pages/settings.lua",
-   "n": 18763,
-   "c": 1546582061
+   "n": 19771,
+   "c": 2146184398
   },
   {
    "p": "thugnet/ui/panel.lua",

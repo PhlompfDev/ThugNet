@@ -121,7 +121,17 @@ local function wire()
     handlers = {}
     handlers[#handlers + 1] = D.kernel.on_event("http_success", function(url, handle)
         local p = pending[url]
-        if not p then return end
+        if not p then
+            -- A LATE arrival: this request already timed out (the timeout
+            -- timer cleared pending[url] and resolved every caller with
+            -- "timeout"), and the real response is only showing up now. There
+            -- is nobody left to hand the body to, but the handle itself is a
+            -- live CC:Tweaked resource that counts against the http
+            -- connection limit until closed -- returning here without
+            -- closing it leaks one handle per late arrival, forever.
+            if handle and handle.close then pcall(handle.close) end
+            return
+        end
         pending[url] = nil
         p.timer.cancel()
         local body = ""
@@ -131,7 +141,13 @@ local function wire()
         end
         dispatch_cbs(p.cbs, body, nil)
     end)
-    handlers[#handlers + 1] = D.kernel.on_event("http_failure", function(url, reason)
+    handlers[#handlers + 1] = D.kernel.on_event("http_failure", function(url, reason, handle)
+        -- CC:Tweaked passes a response `handle` here too when the server
+        -- actually answered with a non-2xx status (e.g. a 404) -- it is a
+        -- live resource exactly like http_success's handle, and must be
+        -- closed on every path, including the "late" (already timed out)
+        -- one below, or it leaks the same way.
+        if handle and handle.close then pcall(handle.close) end
         local p = pending[url]
         if not p then return end
         pending[url] = nil
@@ -195,7 +211,13 @@ end
 -- must never be left waiting on a re-render that will never come.
 ---@param cb? fun(state:string)
 function updater.check(cb)
-    if S.state == "checking" or S.state == "downloading" then
+    -- "staged" must refuse here too: without this, the scheduled 30-minute
+    -- poll clobbers a cycle that already finished downloading back to
+    -- "available", discarding 100+ verified files for nothing -- and on a
+    -- busy node with auto-update on, that repeats forever (check -> download
+    -- -> staged -> idle probe false -> poll fires 30 min later -> re-download
+    -- everything).
+    if S.state == "checking" or S.state == "downloading" or S.state == "staged" then
         if cb then cb(S.state) end
         return
     end
@@ -219,8 +241,19 @@ function updater.check(cb)
         S.latest = m.version
         if updater.is_newer(m.version, S.installed) then
             set_state("available")
-            if D.events then
-                D.events.log("info", "update", "v" .. m.version .. " available")
+            -- Once per version, like the on_notify path just below (in
+            -- after_check) -- NOT once per 30-minute poll. Tracked
+            -- separately from update_notified_version (which only advances
+            -- when the notify preference is on): this log line is a
+            -- diagnostic, not a user preference, and must dedupe regardless
+            -- of whether toast notifications are enabled. The events ring
+            -- holds only 200 entries, so a duplicate every half hour would
+            -- eventually crowd out real diagnostics.
+            if D.bus.get("update_logged_version") ~= m.version then
+                D.bus.set("update_logged_version", m.version, { persist = true })
+                if D.events then
+                    D.events.log("info", "update", "v" .. m.version .. " available")
+                end
             end
         else
             set_state("up_to_date")
@@ -285,6 +318,44 @@ function updater.download(cb)
         end
     end
 
+    -- ── free-space preflight ────────────────────────────────────────────
+    -- A live tree + staged copy + backup copy have to fit simultaneously.
+    -- Peak EXTRA usage beyond what the live tree already occupies is
+    -- roughly: the manifest's own total (the staged copy) PLUS a backup
+    -- copy of the previously-installed tree of about the same size (a
+    -- typical release only touches a handful of files, so the old tree's
+    -- total and the new manifest's total are close enough to treat as
+    -- equal without walking the whole live filesystem to measure it
+    -- exactly) -- i.e. roughly 2x the manifest total. fs.getFreeSpace("/")
+    -- already reports space beyond what the live tree occupies, so that
+    -- 2x figure is exactly what must fit in it. Without this check, CC
+    -- throws "Out of space" out of f.write/f.close mid-download; that
+    -- throw used to escape into dispatch_cbs's pcall and skip
+    -- next_file(), wedging S.state at "downloading" forever with orphaned
+    -- staged files on a now-full disk (see F3 below for the throw itself).
+    -- fs.getFreeSpace may not exist on every CC:Tweaked build/config --
+    -- "cannot determine" must mean "proceed", never "refuse", or a working
+    -- update could be blocked purely because the environment can't answer
+    -- the question.
+    if fs.getFreeSpace then
+        local ok_free, free = pcall(fs.getFreeSpace, "/")
+        if ok_free and type(free) == "number" then
+            local total = 0
+            for _, f in ipairs(files) do total = total + (tonumber(f.n) or 0) end
+            local required = total * 2
+            if free < required then
+                set_state("error", "not enough disk space")
+                if D.events then
+                    D.events.log("warn", "update",
+                        ("download refused: need ~%d bytes free (have %d)")
+                            :format(required, free))
+                end
+                if cb then cb(S.state) end
+                return
+            end
+        end
+    end
+
     S.done, S.total = 0, #files
     set_state("downloading")
 
@@ -306,18 +377,33 @@ function updater.download(cb)
         end
         local f = files[i]
         fetch(updater.BASE .. f.p, function(body, err)
-            if err then return abort(f.p .. ": " .. err) end
-            if #body ~= f.n then
-                return abort(f.p .. ": wrong size")
+            -- The callback body is wrapped in its own pcall: write_file can
+            -- throw (fs.makeDir/f.write/f.close, e.g. "Out of space" even
+            -- after the preflight above -- estimates can still be wrong, or
+            -- something else fills the disk mid-download). Any throw here
+            -- would otherwise escape into dispatch_cbs's pcall, which just
+            -- logs and returns -- next_file() is never called and S.state
+            -- is stranded at "downloading" until the next reboot. Catching
+            -- it here and funnelling it through abort() keeps the existing
+            -- abort behaviour (discard stage, error state, log) on this
+            -- path too.
+            local ok, threw = pcall(function()
+                if err then return abort(f.p .. ": " .. err) end
+                if #body ~= f.n then
+                    return abort(f.p .. ": wrong size")
+                end
+                if checksum.sum(body) ~= f.c then
+                    return abort(f.p .. ": checksum mismatch")
+                end
+                if not write_file(updater.staged_path(f.p), body) then
+                    return abort(f.p .. ": cannot write")
+                end
+                S.done = i
+                next_file(i + 1)
+            end)
+            if not ok then
+                abort(f.p .. ": " .. tostring(threw))
             end
-            if checksum.sum(body) ~= f.c then
-                return abort(f.p .. ": checksum mismatch")
-            end
-            if not write_file(updater.staged_path(f.p), body) then
-                return abort(f.p .. ": cannot write")
-            end
-            S.done = i
-            next_file(i + 1)
         end)
     end
 
@@ -335,6 +421,22 @@ end
 
 local function backup_path(rel) return updater.BACKUP_DIR .. "/" .. rel end
 
+-- fs.delete on a real CC:Tweaked node recursively removes an entire
+-- directory tree in one call; the flat-file test stub does not (it only
+-- clears an exact key match -- see discard_stage()'s note on STAGE_DIR
+-- above, the same limitation). Walking with fs.list/fs.isDir (already used
+-- by rollback_if_needed()'s restore_dir) and deleting each entry
+-- individually is correct on BOTH: harmless belt-and-suspenders on real CC,
+-- and the only thing that actually clears anything on the stub.
+local function delete_tree(dir)
+    if not (fs.exists(dir) or fs.isDir(dir)) then return end
+    for _, name in ipairs(fs.list(dir)) do
+        local abs = dir .. "/" .. name
+        if fs.isDir(abs) then delete_tree(abs) else pcall(fs.delete, abs) end
+    end
+    pcall(fs.delete, dir)
+end
+
 -- Swap the staged tree in. Config preservation is STRUCTURAL, not a special
 -- case: this only ever writes paths in the new manifest and only ever deletes
 -- paths in the old one. Runtime JSONs are generated on the node, so they are
@@ -343,6 +445,15 @@ local function backup_path(rel) return updater.BACKUP_DIR .. "/" .. rel end
 ---@return boolean applied
 function updater.apply()
     if S.state ~= "staged" then return false end
+
+    -- 0. clear the previous release's backup before writing a fresh one.
+    -- Without this, a file that a past release REMOVED stays in .tn_backup
+    -- forever (this function only ever writes into it, never clears it), so
+    -- a later rollback resurrects a file some earlier release deliberately
+    -- deleted. It also means the backup would otherwise accumulate every
+    -- file that has ever shipped, which directly worsens the disk headroom
+    -- the free-space preflight in download() has to reason about.
+    delete_tree(updater.BACKUP_DIR)
 
     local old = D.store.load(updater.INSTALLED, nil)
     local old_files = {}
@@ -363,6 +474,22 @@ function updater.apply()
             if body then write_file(backup_path(p), body) end
         end
     end
+
+    -- Arm rollback HERE -- after the backup is complete, but BEFORE the
+    -- first destructive write below. If the world is saved/quit, the chunk
+    -- unloads, or the server dies partway through step 2, the live tree
+    -- ends up part old / part new -- but the backup just written above is
+    -- already complete and correct. Writing the marker only at the very end
+    -- (the old ordering) meant that crash left NO marker on disk at all, so
+    -- rollback_if_needed() would no-op on every later boot forever, bricking
+    -- the node with only manual recovery. Nothing about the success path
+    -- changes: boot_ok() still disarms this the same way either ordering.
+    -- A stale ATTEMPT_MARKER from some earlier, already-resolved cycle must
+    -- never leak into THIS cycle's first boot -- that would make boot 1 of a
+    -- brand new install roll back immediately, as if it were already boot 2
+    -- of a previous, unrelated failure.
+    pcall(fs.delete, updater.ATTEMPT_MARKER)
+    write_file(updater.MARKER, tostring(S.latest))
 
     -- 2. swap the staged files in
     local new_files = {}
@@ -389,7 +516,7 @@ function updater.apply()
         D.events.log("info", "update", "installed v" .. tostring(S.latest) .. ", rebooting")
     end
 
-    -- 5. arm rollback, then reboot
+    -- 5. reboot
     -- Flush the bus before rebooting: bus.lua debounces persistent-key writes
     -- by ~0.5s (see DEBOUNCE_SECS in bus.lua), and this reboot happens
     -- immediately. Without an explicit flush here, any bus state set in the
@@ -398,12 +525,6 @@ function updater.apply()
     -- on a normal shutdown, and what the Reboot button (Task 11) does on a
     -- manual reboot -- both reboot paths should behave consistently.
     if D.bus and D.bus.flush then pcall(D.bus.flush) end
-    -- A stale ATTEMPT_MARKER from some earlier, already-resolved cycle must
-    -- never leak into THIS cycle's first boot -- that would make boot 1 of a
-    -- brand new install roll back immediately, as if it were already boot 2
-    -- of a previous, unrelated failure.
-    pcall(fs.delete, updater.ATTEMPT_MARKER)
-    write_file(updater.MARKER, tostring(S.latest))
     os.reboot()
     return true
 end
