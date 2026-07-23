@@ -38,6 +38,7 @@ local protocol  = require("thugnet.net.protocol")
 local transport = require("thugnet.net.transport")
 local migrate   = require("thugnet.migrate")
 local updater   = require("thugnet.core.updater")
+local requests  = require("thugnet.core.requests")
 
 -- convert any v1 files before anything reads them — INCLUDING the wizard
 -- gate: validation and the wizard's domain prefill must see the migrated
@@ -62,6 +63,9 @@ rsio.init(kernel)
 steps.init(kernel)
 transport.init(kernel, protocol)
 updater.init{ kernel = kernel, store = store, bus = bus, events = events }
+-- feature requests need cfg (token + node label), so init after config.load
+requests.init{ kernel = kernel, store = store, bus = bus, events = events,
+               config = cfg }
 
 for _, name in ipairs(migrated.migrated) do
     events.log("info", "kernel", "migrated v1 file: " .. name)
@@ -118,6 +122,8 @@ if cfg.roles.ui then
     nav.register(require("thugnet.ui.pages.automation"))
     nav.register(require("thugnet.ui.pages.displays"))
     nav.register(require("thugnet.ui.pages.settings"))
+    nav.register(require("thugnet.ui.pages.feature_request"))
+    nav.register(require("thugnet.ui.pages.sent_requests"))
     local custom_pages = require("thugnet.core.custom_pages")
     local custom = require("thugnet.ui.pages.custom")
     local editor_store = require("thugnet.core.editor_store")

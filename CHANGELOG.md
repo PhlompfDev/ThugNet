@@ -3,6 +3,15 @@
 Newest first. The Settings > Updates tab reads this file, showing the
 sections newer than the version a node currently runs.
 
+## v2.2.0
+
+- **Feature Requests from the panel** — Settings > Updates > Feature Request
+  opens a composer that files your request straight into the public inbox
+  the build agent watches. A Sent Requests page shows what each request's
+  status is (waiting, in progress, shipped, and so on).
+- Sending needs a GitHub token set once per node (Set Token... on the page);
+  checking statuses works without one.
+
 ## v2.1.0
 
 - **Easy Updater** — nodes now update themselves from GitHub. Settings >

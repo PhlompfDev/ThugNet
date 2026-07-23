@@ -1,10 +1,10 @@
 {
- "version": "2.1.0",
+ "version": "2.2.0",
  "files": [
   {
    "p": "CHANGELOG.md",
-   "n": 793,
-   "c": 1594627668
+   "n": 1204,
+   "c": 1321968633
   },
   {
    "p": "README.md",
@@ -293,8 +293,8 @@
   },
   {
    "p": "startup.lua",
-   "n": 9373,
-   "c": 1005676711
+   "n": 9728,
+   "c": 401858982
   },
   {
    "p": "thugnet/config.lua",
@@ -330,6 +330,11 @@
    "p": "thugnet/core/events.lua",
    "n": 2366,
    "c": 1015541135
+  },
+  {
+   "p": "thugnet/core/requests.lua",
+   "n": 15541,
+   "c": 3746958328
   },
   {
    "p": "thugnet/core/rsio.lua",
@@ -482,6 +487,11 @@
    "c": 1696657605
   },
   {
+   "p": "thugnet/ui/pages/feature_request.lua",
+   "n": 5038,
+   "c": 4080911358
+  },
+  {
    "p": "thugnet/ui/pages/monitoring.lua",
    "n": 10166,
    "c": 2265126155
@@ -490,6 +500,11 @@
    "p": "thugnet/ui/pages/scenes.lua",
    "n": 10308,
    "c": 2944388791
+  },
+  {
+   "p": "thugnet/ui/pages/sent_requests.lua",
+   "n": 5223,
+   "c": 396601919
   },
   {
    "p": "thugnet/ui/pages/server.lua",
@@ -503,8 +518,8 @@
   },
   {
    "p": "thugnet/ui/pages/settings.lua",
-   "n": 19771,
-   "c": 2146184398
+   "n": 19631,
+   "c": 4186638205
   },
   {
    "p": "thugnet/ui/panel.lua",
@@ -529,7 +544,7 @@
   {
    "p": "thugnet/version.lua",
    "n": 316,
-   "c": 1324903885
+   "c": 1325231566
   }
  ]
 }

@@ -194,19 +194,16 @@ return {
                 end,
             }
 
-            -- Deliberately functionless this phase. It renders dim with a
-            -- "(soon)" suffix and says so on click: a button that silently
-            -- does nothing reads as a bug. Later it will live-view and edit a
-            -- markdown file in the repo that an agent watches, implements and
-            -- pushes -- with this updater carrying the result back to nodes.
+            -- Live since Phase 12: opens the request composer, which files a
+            -- `## Title` block into the public ThugNet-Requests inbox that
+            -- the agent loop watches -- and this updater carries the result
+            -- back to every node once the owner merges and publishes.
             ui.PushButton{
-                parent = content, x = 2, y = y + 6, width = 23,
-                text = "Feature Request (soon)",
-                fg_bg = ui.cpair(theme.tokens.raised, theme.tokens.panel),
-                active_fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.panel),
-                callback = function()
-                    say("feature requests aren't wired up yet")
-                end,
+                parent = content, x = 2, y = y + 6, width = 17,
+                text = "Feature Request",
+                fg_bg = ui.cpair(theme.tokens.text, theme.tokens.raised),
+                active_fg_bg = ui.cpair(theme.tokens.bg, theme.tokens.accent),
+                callback = function() ui_ctx.nav_to("feature_request") end,
             }
 
             ui.Checkbox{
