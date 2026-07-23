@@ -4,6 +4,7 @@ local ui = require("graphics.ui")
 local widgets = require("thugnet.ui.widgets")
 local flasher = require("graphics.flasher")
 local updater = require("thugnet.core.updater")
+local util = require("scada-common.util")
 
 local TABS = { "Updates", "Node", "Roles" }
 
@@ -213,8 +214,11 @@ return {
                     updater.fetch(updater.BASE .. "CHANGELOG.md", function(body, err)
                         if err or not body then return say("changelog unavailable: "
                             .. tostring(err or "empty")) end
-                        bus.set("settings_changelog", body)
-                        bus.set("settings_changelog_ver", ver)
+                        -- persist so it is fetched once PER VERSION even across
+                        -- reboots, not once per session (request: fetch once,
+                        -- cache until the version moves)
+                        bus.set("settings_changelog", body, { persist = true })
+                        bus.set("settings_changelog_ver", ver, { persist = true })
                         bus.set("settings_tab", "Changelog")
                         if ui_ctx.request_rebuild then ui_ctx.request_rebuild() end
                     end)
@@ -265,17 +269,26 @@ return {
                 fg_bg = theme.fg_bg("text", "bg"),
                 nav_fg_bg = ui.cpair(theme.tokens.raised, theme.tokens.bg),
                 nav_active = ui.cpair(theme.tokens.accent, theme.tokens.bg) }
+            -- Each source line is word-wrapped to the panel width instead of
+            -- rendered in a single truncating row: a TextBox wraps its value
+            -- across `height` rows (util.strwrap), so a long changelog bullet
+            -- now spans as many rows as it needs rather than being cut off.
+            local wrap_w = w - 5
             local row = 1
             for line in tostring(body):gmatch("([^\n]*)\n?") do
                 if row > 200 then break end
                 local is_head = line:match("^##%s") ~= nil
-                if line ~= "" then
-                    ui.TextBox{ parent = list, x = 1, y = row, width = w - 5, height = 1,
-                        text = (line:gsub("^#+%s*", "")),
+                local clean = line:gsub("^#+%s*", "")
+                if clean ~= "" then
+                    local n = math.max(1, #util.strwrap(clean, math.max(1, wrap_w)))
+                    ui.TextBox{ parent = list, x = 1, y = row, width = wrap_w, height = n,
+                        text = clean,
                         fg_bg = is_head and ui.cpair(theme.tokens.accent, theme.tokens.bg)
                                         or ui.cpair(theme.tokens.text, theme.tokens.bg) }
+                    row = row + n
+                else
+                    row = row + 1   -- preserve blank spacer lines
                 end
-                row = row + 1
             end
             ui.PushButton{
                 parent = content, x = 2, y = h - 1, width = 8, text = "Back",

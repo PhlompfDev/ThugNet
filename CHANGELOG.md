@@ -3,6 +3,14 @@
 Newest first. The Settings > Updates tab reads this file, showing the
 sections newer than the version a node currently runs.
 
+## v2.2.9
+
+- Home page DNS and Server dots now show live status: they pulse green while the service is up and turn solid red when it is down (stopping the server now turns its dot red instead of staying green).
+- Monitoring page updates an inventory sensor's breakdown live -- no manual refresh needed.
+- Switching pages no longer flickers monitors.
+- The What's New changelog now wraps long lines instead of cutting them off, and is cached so it is only fetched once per version.
+- Added breathing room above the New Rule / New Scene / event filter buttons.
+
 ## v2.2.8
 
 - Updates are more resilient: a file that briefly stalls while downloading is now retried instead of failing the whole update, and requests are paced to avoid rate-limit stalls.

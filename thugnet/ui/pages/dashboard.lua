@@ -19,23 +19,44 @@ return {
 
         local y = widgets.section(content, 2, 1, w - 2, "SYSTEM", theme)
         local x = 2
-        local dns_chip = widgets.chip(content, x, y, "DNS", theme); x = x + dns_chip.width + 2
-        local srv_chip = widgets.chip(content, x, y, "Server", theme); x = x + srv_chip.width + 2
+        -- DNS + Server are live-heartbeat dots (pulse green up / solid red down),
+        -- reading the ACTUAL service state, not static roles. Auto is a config
+        -- authority flag, not a connection, so it stays a steady chip.
+        local dns_dot = widgets.pulse_dot(content, x, y, "DNS", theme); x = x + dns_dot.width + 2
+        local srv_dot = widgets.pulse_dot(content, x, y, "Server", theme); x = x + srv_dot.width + 2
         local auto_chip = widgets.chip(content, x, y, "Auto", theme)
 
-        local function refresh_chips()
-            if ui_ctx.client then
-                dns_chip.set(ui_ctx.client.dns_ok() and "ok" or "alert")
-            else
-                dns_chip.set("off")
+        local roles = ui_ctx.config.roles or {}
+        -- a DNS host reports its own service; anyone else reports the client's
+        -- link. A node with neither shows the dot inert.
+        local function dns_state()
+            if ui_ctx.dns and roles.dns then
+                return ui_ctx.dns.is_active() and "up" or "down"
+            elseif ui_ctx.client then
+                return ui_ctx.client.dns_ok() and "up" or "down"
             end
-            srv_chip.set((ui_ctx.config.roles or {}).server and "ok" or "off")
+            return "off"
+        end
+        -- the server dot follows whether THIS node's server is actually running
+        -- -- stopping it turns the dot red, which reading roles.server never did
+        local function srv_state()
+            if ui_ctx.server and roles.server then
+                return ui_ctx.server.is_active() and "up" or "down"
+            end
+            return "off"
+        end
+
+        local phase = false
+        local function refresh_chips()
+            phase = not phase
+            dns_dot.beat(dns_state(), phase)
+            srv_dot.beat(srv_state(), phase)
             auto_chip.set(ui_ctx.config.automation and "ok" or "off")
         end
         refresh_chips()
-        if ui_ctx.client then
-            ui_ctx.own(ui_ctx.client.on_dns(refresh_chips))
-        end
+        -- one shared 1s heartbeat drives the pulse AND polls up/down state
+        -- (the front-panel pattern) so the dots can never sit stale-green
+        ui_ctx.own(ui_ctx.kernel.every(1, refresh_chips))
 
         local dy = widgets.section(content, 2, y + 2, w - 2, "DOMAINS", theme)
 

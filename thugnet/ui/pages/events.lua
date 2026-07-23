@@ -23,6 +23,7 @@ return {
         -- header rule stops short of the Clear button instead of running
         -- underneath it
         local y = widgets.section(content, 2, 1, w - 11, "EVENT FEED", theme)
+        y = y + 1 -- blank row so the filter strip doesn't touch the accent bar above
 
         -- filter strip: one toggle button per source, flowed onto as many
         -- rows as the width allows. A single-row MultiButton pads every

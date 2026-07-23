@@ -33,6 +33,31 @@ function widgets.chip(parent, x, y, label, theme)
     return chip
 end
 
+-- Pulsing status dot: a live heartbeat for a network service (the front-panel
+-- pattern, brought to the touchscreen). The caller drives the blink `phase` on
+-- a shared timer so several dots pulse in sync and a frozen node visibly stops.
+--   "up"   -> breathes between the two greens (ok / ok_bright)
+--   "down" -> solid red
+--   "off"  -> inert (this node doesn't run that service)
+-- Returns { width, beat(state, phase) }.
+function widgets.pulse_dot(parent, x, y, label, theme)
+    local dot = ui.TextBox{ parent = parent, x = x, y = y, width = 1, height = 1, text = "\x07",
+                            fg_bg = ui.cpair(theme.tokens.raised, theme.tokens.bg) }
+    ui.TextBox{ parent = parent, x = x + 2, y = y, width = #label, height = 1, text = label,
+                fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.bg) }
+    local d = { width = #label + 3 }
+    function d.beat(state, phase)
+        if state == "up" then
+            dot.recolor(phase and theme.tokens.ok_bright or theme.tokens.ok)
+        elseif state == "down" then
+            dot.recolor(theme.tokens.alert)
+        else
+            dot.recolor(theme.tokens.raised)
+        end
+    end
+    return d
+end
+
 -- key/value row; returns { set(value_text) }
 function widgets.kv_row(parent, x, y, w, key, theme)
     local key_w = #key + 1

@@ -35,6 +35,7 @@ return {
         local theme = ui_ctx.theme
         local w, h = content.window().getSize()
         local y = widgets.section(content, 2, 1, w - 2, "AUTOMATION", theme)
+        y = y + 1 -- blank row so + New Rule doesn't touch the accent bar above
 
         ui.PushButton{
             parent = content, x = 2, y = y, width = 14, text = "+ New Rule",

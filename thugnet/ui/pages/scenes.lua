@@ -18,6 +18,7 @@ return {
         local w, h = content.window().getSize()
 
         local y = widgets.section(content, 2, 1, w - 2, "SCENES", theme)
+        y = y + 1 -- blank row so + New Scene doesn't touch the accent bar above
 
         ui.PushButton{
             parent = content, x = 2, y = y, width = 14, text = "+ New Scene",

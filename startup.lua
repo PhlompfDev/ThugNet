@@ -176,6 +176,9 @@ if cfg.roles.ui then
         kernel = kernel, bus = bus, events = events, config = cfg,
         client = client, telemetry_cache = telemetry_cache, store = store,
         transport = transport, updater = updater,
+        -- live service handles so the home/header status dots mirror the real
+        -- network state (server running? DNS up?) instead of static config
+        server = server_service, dns = dns_service,
         on_sidebar_menu = {
             new_page = function(name)
                 custom_pages.add(name)

@@ -1,10 +1,10 @@
 {
- "version": "2.2.8",
+ "version": "2.2.9",
  "files": [
   {
    "p": "CHANGELOG.md",
-   "n": 2546,
-   "c": 2524606093
+   "n": 3106,
+   "c": 3844223763
   },
   {
    "p": "README.md",
@@ -293,8 +293,8 @@
   },
   {
    "p": "startup.lua",
-   "n": 9728,
-   "c": 401858982
+   "n": 9935,
+   "c": 2658805194
   },
   {
    "p": "thugnet/config.lua",
@@ -413,8 +413,8 @@
   },
   {
    "p": "thugnet/ui/app.lua",
-   "n": 26667,
-   "c": 3683704391
+   "n": 29348,
+   "c": 3982963557
   },
   {
    "p": "thugnet/ui/editor/colors.lua",
@@ -453,8 +453,8 @@
   },
   {
    "p": "thugnet/ui/pages/automation.lua",
-   "n": 7181,
-   "c": 3919597451
+   "n": 7261,
+   "c": 700213137
   },
   {
    "p": "thugnet/ui/pages/custom.lua",
@@ -463,8 +463,8 @@
   },
   {
    "p": "thugnet/ui/pages/dashboard.lua",
-   "n": 5326,
-   "c": 650558040
+   "n": 6425,
+   "c": 3378909212
   },
   {
    "p": "thugnet/ui/pages/displays.lua",
@@ -483,8 +483,8 @@
   },
   {
    "p": "thugnet/ui/pages/events.lua",
-   "n": 5382,
-   "c": 1696657605
+   "n": 5468,
+   "c": 281021414
   },
   {
    "p": "thugnet/ui/pages/feature_request.lua",
@@ -493,13 +493,13 @@
   },
   {
    "p": "thugnet/ui/pages/monitoring.lua",
-   "n": 11416,
-   "c": 671515465
+   "n": 12699,
+   "c": 773384086
   },
   {
    "p": "thugnet/ui/pages/scenes.lua",
-   "n": 10308,
-   "c": 2944388791
+   "n": 10389,
+   "c": 3928614675
   },
   {
    "p": "thugnet/ui/pages/sent_requests.lua",
@@ -518,8 +518,8 @@
   },
   {
    "p": "thugnet/ui/pages/settings.lua",
-   "n": 21563,
-   "c": 1947150260
+   "n": 22421,
+   "c": 4136903102
   },
   {
    "p": "thugnet/ui/panel.lua",
@@ -538,13 +538,13 @@
   },
   {
    "p": "thugnet/ui/widgets.lua",
-   "n": 7132,
-   "c": 3954802734
+   "n": 8315,
+   "c": 1456861371
   },
   {
    "p": "thugnet/version.lua",
    "n": 316,
-   "c": 1326804438
+   "c": 1327001047
   }
  ]
 }

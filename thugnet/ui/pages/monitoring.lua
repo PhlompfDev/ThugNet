@@ -142,6 +142,22 @@ return {
                         text = "   \x07 " .. nm .. " x" .. tostring(item.count),
                         fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.bg) }
                 end
+                -- A row's STRUCTURE can change at runtime: a sensor gains a
+                -- bar (fraction appears) or, for an inventory sensor, its
+                -- breakdown rows change. Those are separate list children built
+                -- above -- they can't be patched by the in-place value update
+                -- below -- so a structural change rebuilds the page (debounced).
+                -- Value/rate-only changes never touch this, so the common case
+                -- stays a cheap in-place repaint.
+                local function shape_sig(reading)
+                    if type(reading) ~= "table" then return "none" end
+                    local parts = { reading.fraction ~= nil and "bar" or "flat" }
+                    for _, item in ipairs(reading.detail or {}) do
+                        parts[#parts + 1] = tostring(item.name) .. "=" .. tostring(item.count)
+                    end
+                    return table.concat(parts, "|")
+                end
+                local built_shape = shape_sig(r)
                 -- live update in place. A row built before its first reading
                 -- (declared but silent) still updates the moment one arrives.
                 ui_ctx.own(cache.watch(path, function(reading)
@@ -149,6 +165,11 @@ return {
                     tb.recolor(row_color(reading))
                     if bar and type(reading) == "table" and tonumber(reading.fraction) then
                         bar.set_value(reading.fraction)
+                    end
+                    local sig = shape_sig(reading)
+                    if sig ~= built_shape then
+                        built_shape = sig
+                        if ui_ctx.request_rebuild then ui_ctx.request_rebuild() end
                     end
                 end))
                 -- context menu

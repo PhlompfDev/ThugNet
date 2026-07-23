@@ -19,12 +19,18 @@ local SIDEBAR_MIN_W = 30
 local TOAST_SECS = 5
 local DISPLAYS_PATH = "displays.json"
 
-local C                  -- ctx = { kernel, bus, events, config, client, telemetry_cache, store, updater? }
+local C                  -- ctx = { kernel, bus, events, config, client, server?, dns?, telemetry_cache, store, updater? }
 local started = false
 local building = false
 local surfaces = {}      -- { target, display, root_win?, page_id, owned = {handles}, kind, rect?, monitor? }
 local app_handles = {}   -- live for the whole app (event routing etc.)
 local rebuild_pending = nil
+local themed = {}        -- target key -> config signature. theme.apply() (which
+                         -- sets the palette AND clears the whole surface) runs
+                         -- only when this signature changes -- so a page SWITCH
+                         -- repaints the new frame over the old one with no
+                         -- full-surface clear, which is what caused the flicker
+                         -- on monitors. Reset on any hardware/size change below.
 local toasts = {}        -- per root target: { win, timer }
 local last_rc = { x = 2, y = 2 }  -- absolute terminal coords of last right-click
                                   -- (anchor for ui_ctx.menu / ui_ctx.prompt)
@@ -51,6 +57,18 @@ function app.zone_rects(w, h, rows, cols)
 end
 
 -- ── helpers ──────────────────────────────────────────────────────────────
+
+-- Apply the palette + clear a target only when its config signature changes.
+-- On an unchanged rebuild (the common case: a page switch) this is a no-op, so
+-- the surface is never cleared and the freshly built frame simply overpaints
+-- the previous one -- the flicker fix. `before` runs (e.g. setTextScale) only
+-- when a real re-theme happens.
+local function apply_theme_once(key, target, sig, before)
+    if themed[key] == sig then return end
+    themed[key] = sig
+    if before then before() end
+    theme.apply(target)
+end
 
 local function monitors()
     local out = {}
@@ -105,6 +123,10 @@ local function make_ui_ctx(surface)
         bus = C.bus,
         events = C.events,
         client = C.client,
+        -- live service handles so status surfaces mirror the ACTUAL network
+        -- state, not static config (the home dots read these, not roles.*)
+        server = C.server,
+        dns = C.dns,
         telemetry_cache = C.telemetry_cache,
         config = C.config,
         transport = C.transport,
@@ -309,7 +331,7 @@ end
 
 local function build_terminal_surface(target)
     local w, h = target.getSize()
-    theme.apply(target)
+    apply_theme_once("terminal", target, w .. "x" .. h)
     local display = ui.DisplayBox{ window = target, fg_bg = theme.fg_bg("text", "bg") }
     -- Overlays (context menu / text prompt) save+restore the pixels they cover
     -- via getLine, which exists on `window` objects but NOT on a raw terminal
@@ -357,14 +379,29 @@ local function build_terminal_surface(target)
                 width = math.max(1, math.min(#C.config.label, w - title_x - 6)),
                 height = 1, text = C.config.label,
                 fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.panel) }
+    -- top-right DNS heartbeat: pulses between the two greens while the link is
+    -- up, solid red when down, inert when this node neither hosts DNS nor runs
+    -- a client. It mirrors the home page's DNS dot so the two never disagree,
+    -- and reflects a DNS HOST's own service (not only a client's link), which
+    -- the old client-only version missed on a dns-host-only node.
     local dns_dot = ui.TextBox{ parent = display, x = w - 4, y = 1, width = 3, height = 1,
                                 text = "\x07 ", fg_bg = ui.cpair(theme.tokens.raised, theme.tokens.panel) }
-    if C.client then
-        local function set_dot(ok)
-            dns_dot.recolor(ok and theme.tokens.ok_bright or theme.tokens.alert)
-        end
-        set_dot(C.client.dns_ok())
-        surface.owned[#surface.owned + 1] = C.client.on_dns(set_dot)
+    local function header_dns_up()
+        if C.dns and (C.config.roles or {}).dns then return C.dns.is_active() == true
+        elseif C.client then return C.client.dns_ok() == true end
+        return nil   -- neither role: not applicable
+    end
+    local hdr_phase = false
+    local function beat_header_dot()
+        hdr_phase = not hdr_phase
+        local up = header_dns_up()
+        if up == nil then dns_dot.recolor(theme.tokens.raised)
+        elseif up then dns_dot.recolor(hdr_phase and theme.tokens.ok_bright or theme.tokens.ok)
+        else dns_dot.recolor(theme.tokens.alert) end
+    end
+    beat_header_dot()
+    if header_dns_up() ~= nil then
+        surface.owned[#surface.owned + 1] = C.kernel.every(1, beat_header_dot)
     end
 
     if nav_open then
@@ -387,8 +424,11 @@ end
 
 local function build_monitor_surface(name, mon)
     local cfg = display_cfg(name)
-    if mon.setTextScale then mon.setTextScale(cfg.text_scale or 1.0) end
-    theme.apply(mon)
+    -- re-theme (and re-scale + clear) only when the scale or zone layout
+    -- changes; a plain page switch skips it, so the monitor never flashes
+    apply_theme_once("mon:" .. name, mon,
+        (cfg.text_scale or 1.0) .. "|" .. cfg.zones.rows .. "x" .. cfg.zones.cols,
+        function() if mon.setTextScale then mon.setTextScale(cfg.text_scale or 1.0) end end)
     local mw, mh = mon.getSize()
     local rects = app.zone_rects(mw, mh, cfg.zones.rows, cfg.zones.cols)
     for i, rect in ipairs(rects) do
@@ -520,7 +560,7 @@ end
 
 -- ── public lifecycle ─────────────────────────────────────────────────────
 
----@param ctx table { kernel, bus, events, config, client, telemetry_cache, store, updater? }
+---@param ctx table { kernel, bus, events, config, client, server?, dns?, telemetry_cache, store, updater? }
 function app.start(ctx)
     if started then return end
     C = ctx
@@ -560,9 +600,14 @@ function app.start(ctx)
         if tprompt.is_active() then tprompt.handle_paste(text) end
     end))
 
-    -- structural changes -> rebuild
+    -- structural changes -> rebuild. These also invalidate the theme cache: a
+    -- resized/re-attached surface must be re-cleared (its palette may be lost or
+    -- its dimensions changed), unlike a page switch which deliberately isn't.
     for _, ev in ipairs({ "term_resize", "monitor_resize", "peripheral", "peripheral_detach" }) do
-        table.insert(app_handles, C.kernel.on_event(ev, function() app.request_rebuild() end))
+        table.insert(app_handles, C.kernel.on_event(ev, function()
+            themed = {}
+            app.request_rebuild()
+        end))
     end
 
     -- page switch / nav drawer or collapse toggle -> rebuild (deferred so it
@@ -617,6 +662,7 @@ function app.stop()
     if not started then return end
     started = false
     teardown()
+    themed = {}
     for _, h in ipairs(app_handles) do h.cancel() end
     app_handles = {}
 end
