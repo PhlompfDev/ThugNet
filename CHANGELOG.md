@@ -3,6 +3,10 @@
 Newest first. The Settings > Updates tab reads this file, showing the
 sections newer than the version a node currently runs.
 
+## v2.2.4
+
+- Makes the Settings update button's label readable while it is greyed out.
+
 ## v2.2.2
 
 - Fixes sending a feature request crashing with "attempt to use a closed
