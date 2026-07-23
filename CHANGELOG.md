@@ -3,6 +3,10 @@
 Newest first. The Settings > Updates tab reads this file, showing the
 sections newer than the version a node currently runs.
 
+## v2.2.6
+
+- more UI changes and performance changes
+
 ## v2.2.5
 
 - Adds spacing on the Settings page between the header and tabs, around the Feature Request button, and between the role checkboxes.

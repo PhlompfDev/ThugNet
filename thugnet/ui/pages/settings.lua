@@ -190,11 +190,31 @@ return {
                 fg_bg = ui.cpair(theme.tokens.text, theme.tokens.raised),
                 active_fg_bg = ui.cpair(theme.tokens.bg, theme.tokens.accent),
                 callback = function()
+                    -- The changelog only changes when a release does, so the
+                    -- fetched body is cached against the newest version this
+                    -- node knows (latest once a check has run, else the
+                    -- installed version) and reused until that version moves
+                    -- (request 005). A blank cached body is treated as no
+                    -- cache -- same reasoning as the view's fallback below.
+                    -- Status is read HERE, not from the build-time `st`: the
+                    -- background poll can learn a new version while this
+                    -- page sits open (only the button slot rebuilds), and a
+                    -- stale closure would keep serving the old changelog.
+                    local cur = updater.status()
+                    local ver = cur.latest or cur.installed
+                    local cached = bus.get("settings_changelog")
+                    if cached ~= nil and tostring(cached):match("%S") ~= nil
+                        and bus.get("settings_changelog_ver") == ver then
+                        bus.set("settings_tab", "Changelog")
+                        if ui_ctx.request_rebuild then ui_ctx.request_rebuild() end
+                        return
+                    end
                     say("fetching changelog...")
                     updater.fetch(updater.BASE .. "CHANGELOG.md", function(body, err)
                         if err or not body then return say("changelog unavailable: "
                             .. tostring(err or "empty")) end
                         bus.set("settings_changelog", body)
+                        bus.set("settings_changelog_ver", ver)
                         bus.set("settings_tab", "Changelog")
                         if ui_ctx.request_rebuild then ui_ctx.request_rebuild() end
                     end)

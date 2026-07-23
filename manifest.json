@@ -1,10 +1,10 @@
 {
- "version": "2.2.5",
+ "version": "2.2.6",
  "files": [
   {
    "p": "CHANGELOG.md",
-   "n": 2068,
-   "c": 2802698592
+   "n": 2122,
+   "c": 2119358991
   },
   {
    "p": "README.md",
@@ -488,8 +488,8 @@
   },
   {
    "p": "thugnet/ui/pages/feature_request.lua",
-   "n": 5038,
-   "c": 4080911358
+   "n": 5386,
+   "c": 2330407708
   },
   {
    "p": "thugnet/ui/pages/monitoring.lua",
@@ -518,8 +518,8 @@
   },
   {
    "p": "thugnet/ui/pages/settings.lua",
-   "n": 20212,
-   "c": 909488000
+   "n": 21563,
+   "c": 1947150260
   },
   {
    "p": "thugnet/ui/panel.lua",
@@ -544,7 +544,7 @@
   {
    "p": "thugnet/version.lua",
    "n": 316,
-   "c": 1326214611
+   "c": 1326411220
   }
  ]
 }

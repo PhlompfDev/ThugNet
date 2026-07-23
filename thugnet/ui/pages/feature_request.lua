@@ -11,7 +11,10 @@ return {
     name = "Feature Request",
     category = "system",
     min_w = 26,
-    min_h = 12,
+    -- at min_w the padded button strip is three rows deep, ending at row 12,
+    -- with the hint line below (request 005) -- re-derive this whenever the
+    -- page gains rows, or short monitors clip instead of refusing
+    min_h = 14,
     requires_role = "ui",
     hidden = true,
     build = function(content, ui_ctx)
@@ -93,7 +96,9 @@ return {
         local bx, by = 2, y + 6
         for _, d in ipairs(defs) do
             local bw = #d.text + 2
-            if bx > 2 and bx + bw - 1 > w - 2 then bx = 2; by = by + 1 end
+            -- wrapped rows get a blank row between them -- Back sat directly
+            -- under Send Request (request 005)
+            if bx > 2 and bx + bw - 1 > w - 2 then bx = 2; by = by + 2 end
             ui.PushButton{
                 parent = content, x = bx, y = by, width = bw, text = d.text,
                 fg_bg = ui.cpair(d.dimmed and theme.tokens.dim or theme.tokens.text,
