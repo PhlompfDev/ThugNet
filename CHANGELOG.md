@@ -3,6 +3,14 @@
 Newest first. The Settings > Updates tab reads this file, showing the
 sections newer than the version a node currently runs.
 
+## v2.2.1
+
+- Fixes v2.2.0 failing to boot after install (`unexpected symbol near
+  '\239'` — an invisible byte-order mark at the top of one file that CC's
+  Lua loader rejects). If a node installed v2.2.0 and errored, just reboot
+  it until it comes up (auto-rollback restores v2.1.0 by itself), then
+  update again from Settings.
+
 ## v2.2.0
 
 - **Feature Requests from the panel** — Settings > Updates > Feature Request

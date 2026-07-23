@@ -1,10 +1,10 @@
 {
- "version": "2.2.0",
+ "version": "2.2.1",
  "files": [
   {
    "p": "CHANGELOG.md",
-   "n": 1204,
-   "c": 1321968633
+   "n": 1538,
+   "c": 915346278
   },
   {
    "p": "README.md",
@@ -333,8 +333,8 @@
   },
   {
    "p": "thugnet/core/requests.lua",
-   "n": 15541,
-   "c": 3746958328
+   "n": 15538,
+   "c": 2294352271
   },
   {
    "p": "thugnet/core/rsio.lua",
@@ -544,7 +544,7 @@
   {
    "p": "thugnet/version.lua",
    "n": 316,
-   "c": 1325231566
+   "c": 1325428175
   }
  ]
 }

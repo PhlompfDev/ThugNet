@@ -1,4 +1,4 @@
-﻿-- Feature requests filed from the panel, wired to the public
+-- Feature requests filed from the panel, wired to the public
 -- PhlompfDev/ThugNet-Requests repo that the agent loop watches.
 --
 -- ASYNC BY NECESSITY, same as updater.lua: the kernel is a single
