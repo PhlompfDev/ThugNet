@@ -68,6 +68,19 @@ handlers["register"] = function(src, msg)
         end
     end
     registry[msg.domain] = { id = src, commands = msg.commands, sensors = msg.sensors }
+    -- Prune cached telemetry down to the newly-declared roster: a sensor removed
+    -- from the server's config must not linger in the snapshots panels receive,
+    -- or every node that resnapshots resurrects the removed sensor.
+    local tc = tel_cache[msg.domain]
+    if tc then
+        local keep = {}
+        for _, s in ipairs(msg.sensors or {}) do
+            if type(s) == "table" and type(s.name) == "string" then keep[s.name] = true end
+        end
+        for sensor in pairs(tc) do
+            if not keep[sensor] then tc[sensor] = nil end
+        end
+    end
     persist()
     arm_watchdog(msg.domain)
     D.transport.send(src, D.protocol.new("register_ok", { domain = msg.domain }))

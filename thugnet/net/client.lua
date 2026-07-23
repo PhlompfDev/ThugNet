@@ -23,6 +23,32 @@ local function notify(kind, domain)
     end
 end
 
+-- The declared roster is the authority for which sensors exist. The panel
+-- telemetry cache only ever grows (it remembers the last reading of every
+-- sensor that ever published), so after a sensor is removed -- or its whole
+-- domain is -- its stale reading lingers in the cache and keeps surfacing on
+-- the Monitoring page. Prune the cache down to the sensors still declared,
+-- called at every point the roster changes (snapshot, commands_changed,
+-- domain_removed). This also defeats DNS re-injection: a snapshot may carry a
+-- stale reading for a since-removed sensor, and this evicts it right after.
+local function declared_paths()
+    local keep = {}
+    for name, d in pairs(domains) do
+        for _, s in ipairs(d.sensors or {}) do
+            if type(s) == "table" and type(s.name) == "string" then
+                keep[name .. ":" .. s.name] = true
+            end
+        end
+    end
+    return keep
+end
+
+local function prune_cache()
+    if D and D.telemetry_cache and D.telemetry_cache.retain then
+        D.telemetry_cache.retain(declared_paths())
+    end
+end
+
 local function set_dns(ok)
     if dns_alive ~= ok then
         dns_alive = ok
@@ -47,6 +73,7 @@ local function apply_snapshot(snap)
             D.telemetry_cache.update(d.name, sensor, reading)
         end
     end
+    prune_cache()   -- evict any cached path the new roster no longer declares
     notify("snapshot", nil)
 end
 
@@ -126,6 +153,7 @@ handlers["push"] = function(src, msg)
         notify("down", msg.domain)
     elseif msg.kind == "domain_removed" then
         domains[msg.domain] = nil
+        prune_cache()   -- drop the removed domain's cached sensors
         notify("removed", msg.domain)
     elseif msg.kind == "state" then
         if d then
@@ -141,6 +169,7 @@ handlers["push"] = function(src, msg)
         end
         d.commands = msg.commands or d.commands
         d.sensors = msg.sensors or d.sensors
+        prune_cache()   -- a shrunk roster evicts the sensors it dropped
         notify("commands", msg.domain)
     elseif msg.kind == "seq_progress" then
         notify("seq_progress", msg.domain)
@@ -234,6 +263,27 @@ function client.admin(domain, action, args, cb)
 end
 
 function client.request_refresh() request_snapshot() end
+
+-- Locally dismiss a sensor from this panel: drop it from the mirrored roster
+-- and evict its cached reading. This does NOT touch the remote server config --
+-- if the sensor still exists there, a later register/telemetry re-learns it.
+-- It's the manual escape hatch for a sensor whose domain is gone for good.
+---@param domain string
+---@param name string
+function client.forget_sensor(domain, name)
+    local d = domains[domain]
+    if d and d.sensors then
+        for i, s in ipairs(d.sensors) do
+            if type(s) == "table" and s.name == name then
+                table.remove(d.sensors, i); break
+            end
+        end
+    end
+    if D and D.telemetry_cache and D.telemetry_cache.forget then
+        D.telemetry_cache.forget(domain .. ":" .. name)
+    end
+    notify("commands", domain)
+end
 
 ---@return table handle
 function client.on_change(fn)

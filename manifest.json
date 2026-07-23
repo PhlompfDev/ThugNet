@@ -1,10 +1,10 @@
 {
- "version": "2.2.6",
+ "version": "2.2.7",
  "files": [
   {
    "p": "CHANGELOG.md",
-   "n": 2122,
-   "c": 2119358991
+   "n": 2356,
+   "c": 813968353
   },
   {
    "p": "README.md",
@@ -363,8 +363,8 @@
   },
   {
    "p": "thugnet/core/telemetry.lua",
-   "n": 10038,
-   "c": 4108375240
+   "n": 10874,
+   "c": 3978944429
   },
   {
    "p": "thugnet/core/updater.lua",
@@ -383,13 +383,13 @@
   },
   {
    "p": "thugnet/net/client.lua",
-   "n": 8076,
-   "c": 3202562278
+   "n": 10187,
+   "c": 3698190646
   },
   {
    "p": "thugnet/net/dns.lua",
-   "n": 9182,
-   "c": 1338620076
+   "n": 9756,
+   "c": 3945229816
   },
   {
    "p": "thugnet/net/protocol.lua",
@@ -443,8 +443,8 @@
   },
   {
    "p": "thugnet/ui/menus.lua",
-   "n": 12702,
-   "c": 2938643149
+   "n": 12968,
+   "c": 3668016257
   },
   {
    "p": "thugnet/ui/nav.lua",
@@ -493,8 +493,8 @@
   },
   {
    "p": "thugnet/ui/pages/monitoring.lua",
-   "n": 10166,
-   "c": 2265126155
+   "n": 11416,
+   "c": 671515465
   },
   {
    "p": "thugnet/ui/pages/scenes.lua",
@@ -544,7 +544,7 @@
   {
    "p": "thugnet/version.lua",
    "n": 316,
-   "c": 1326411220
+   "c": 1326607829
   }
  ]
 }

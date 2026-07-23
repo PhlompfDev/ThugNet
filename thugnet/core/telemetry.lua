@@ -252,6 +252,26 @@ function telemetry.cache(_)
         return n
     end
 
+    -- Evict a single path. The panel cache is otherwise append-only: a sensor
+    -- removed from a server's config keeps its last reading forever, so it never
+    -- leaves paths() and the Monitoring page lists it indefinitely. The declared
+    -- roster is the authority for what exists; the client drives eviction from it.
+    function c.forget(path)
+        data[path] = nil
+    end
+
+    -- Keep only the paths in `keep` (a set { [path]=true }); evict every other.
+    -- Collect-then-delete so we never mutate `data` mid-traversal.
+    ---@param keep table<string, boolean>
+    function c.retain(keep)
+        keep = keep or {}
+        local drop = {}
+        for path in pairs(data) do
+            if not keep[path] then drop[#drop + 1] = path end
+        end
+        for _, path in ipairs(drop) do data[path] = nil end
+    end
+
     function c.paths()
         -- Published sensors only. watch() lazily creates an entry for paths that
         -- have never published (a widget bound to a typo'd sensor), and listing

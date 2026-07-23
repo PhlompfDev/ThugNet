@@ -172,6 +172,16 @@ return {
                             if ui_ctx.bus then ui_ctx.bus.set("mon_filter", domain, { persist = false }) end
                             if ui_ctx.request_rebuild then ui_ctx.request_rebuild() end
                         end,
+                        -- locally dismiss a lingering/removed sensor: drop it
+                        -- from the client's declared mirror (so a rebuild won't
+                        -- re-list it) and evict this page's cache view of it
+                        forget = function()
+                            if ui_ctx.client and ui_ctx.client.forget_sensor then
+                                ui_ctx.client.forget_sensor(domain, sensor)
+                            end
+                            if cache and cache.forget then cache.forget(path) end
+                            if ui_ctx.request_rebuild then ui_ctx.request_rebuild() end
+                        end,
                     })
                     return true
                 end)
@@ -187,16 +197,25 @@ return {
                 fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.bg) }
         end
 
-        -- new sensors appear with zero config: rebuild when the roster changes.
-        -- Counts the DECLARED set, so a sensor added on a server shows up here
-        -- as soon as it registers, without waiting for a first reading.
-        local known = #all_paths
-        ui_ctx.own(ui_ctx.kernel.every(2, function()
-            local n = #sensor_paths()
-            if n ~= known then
-                known = n
+        -- Rebuild whenever the SET of sensor rows changes -- added, removed, or
+        -- swapped. A count check (the earlier approach) is blind to a removal
+        -- masked by an addition, and never fires on a pure removal once the
+        -- cache stopped shrinking; comparing a signature of the actual paths
+        -- catches every case. Two triggers cover it: a roster change arrives via
+        -- the client's on_change (prompt), and a newly-published path is caught
+        -- by the poll (no change event fires for a first reading).
+        local function signature() return table.concat(sensor_paths(), "\n") end
+        local known_sig = signature()
+        local function resync()
+            local sig = signature()
+            if sig ~= known_sig then
+                known_sig = sig
                 if ui_ctx.request_rebuild then ui_ctx.request_rebuild() end
             end
-        end))
+        end
+        if ui_ctx.client and ui_ctx.client.on_change then
+            ui_ctx.own(ui_ctx.client.on_change(function() resync() end))
+        end
+        ui_ctx.own(ui_ctx.kernel.every(2, resync))
     end,
 }

@@ -182,13 +182,17 @@ function menus.automation_rule_menu(a, opts)
 end
 
 -- ── Sensor tile (Monitoring page) ────────────────────────────────────────
--- Details, Add Rule…, Filter this domain
----@param a table callbacks { details, add_rule, filter_domain }
+-- Details, Add Rule…, Filter this domain, ──, Forget sensor
+-- "Forget" locally dismisses a sensor that is gone/removed but still lingering
+-- (down sensors are shown, not hidden, so a manual escape hatch is needed).
+---@param a table callbacks { details, add_rule, filter_domain, forget }
 function menus.sensor_tile_menu(a)
     return {
         { text = "Details", callback = a.details },
         { text = "Add Rule...", callback = a.add_rule },
         { text = "Filter this domain", callback = a.filter_domain },
+        menus.sep(),
+        { text = "Forget sensor", callback = a.forget },
     }
 end
 
