@@ -116,21 +116,32 @@ end
 -- call, in tests AND in production). A handle whose kernel has since been
 -- reset() is already orphaned and harmless to cancel, but pcall it anyway --
 -- cancelling must never be able to throw and abort the re-wire.
+--
+-- OWNERSHIP, not just lateness: kernel.on_event also BROADCASTS these two
+-- events to every registered handler, and this module is not the only HTTP
+-- user -- core/requests.lua rides the same events. So "url not in my
+-- pending table" does NOT mean "late duplicate of my own request"; it
+-- usually means someone else's response. v2.2.1 in the field: THIS module's
+-- handler (wired first at boot) hit the feature-request module's
+-- Contents-API response, took the not-mine branch, closed the handle -- and
+-- that module's readAll a moment later threw "attempt to use a closed
+-- file". A handle may only ever be closed by the module whose request it
+-- answers. `expired` records our own timed-out requests so a genuinely
+-- late arrival of OURS is still closed (it counts against CC's connection
+-- limit until someone closes it) while a foreign response is left alone.
+local expired = {}   -- url -> true: ours, already timed out, close on arrival
+
 local function wire()
     for _, h in ipairs(handlers) do pcall(h.cancel) end
     handlers = {}
     handlers[#handlers + 1] = D.kernel.on_event("http_success", function(url, handle)
         local p = pending[url]
         if not p then
-            -- A LATE arrival: this request already timed out (the timeout
-            -- timer cleared pending[url] and resolved every caller with
-            -- "timeout"), and the real response is only showing up now. There
-            -- is nobody left to hand the body to, but the handle itself is a
-            -- live CC:Tweaked resource that counts against the http
-            -- connection limit until closed -- returning here without
-            -- closing it leaks one handle per late arrival, forever.
-            if handle and handle.close then pcall(handle.close) end
-            return
+            if expired[url] then
+                expired[url] = nil
+                if handle and handle.close then pcall(handle.close) end
+            end
+            return   -- not ours (or ours-and-expired, closed above)
         end
         pending[url] = nil
         p.timer.cancel()
@@ -144,12 +155,17 @@ local function wire()
     handlers[#handlers + 1] = D.kernel.on_event("http_failure", function(url, reason, handle)
         -- CC:Tweaked passes a response `handle` here too when the server
         -- actually answered with a non-2xx status (e.g. a 404) -- it is a
-        -- live resource exactly like http_success's handle, and must be
-        -- closed on every path, including the "late" (already timed out)
-        -- one below, or it leaks the same way.
-        if handle and handle.close then pcall(handle.close) end
+        -- live resource that must be closed, but ONLY when the request was
+        -- ours (see the ownership note above).
         local p = pending[url]
-        if not p then return end
+        if not p then
+            if expired[url] then
+                expired[url] = nil
+                if handle and handle.close then pcall(handle.close) end
+            end
+            return
+        end
+        if handle and handle.close then pcall(handle.close) end
         pending[url] = nil
         p.timer.cancel()
         local msg = tostring(reason or "request failed")
@@ -170,6 +186,7 @@ local function fetch(url, cb)
         local pp = pending[url]
         if pp then
             pending[url] = nil
+            expired[url] = true   -- the real answer may still arrive; close it then
             dispatch_cbs(pp.cbs, nil, "timeout")
         end
     end)
@@ -193,6 +210,7 @@ function updater.init(deps)
     D = deps
     S = { state = "idle", done = 0, total = 0 }
     pending = {}
+    expired = {}
     S.installed = deps.version or require("thugnet.version")
     -- Tests call kernel.reset() (which wipes kernel.lua's ev_handlers) and
     -- then re-init() to get a clean S/pending for the next scenario. wire()

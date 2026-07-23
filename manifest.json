@@ -1,10 +1,10 @@
 {
- "version": "2.2.1",
+ "version": "2.2.2",
  "files": [
   {
    "p": "CHANGELOG.md",
-   "n": 1538,
-   "c": 915346278
+   "n": 1835,
+   "c": 74480387
   },
   {
    "p": "README.md",
@@ -333,8 +333,8 @@
   },
   {
    "p": "thugnet/core/requests.lua",
-   "n": 15538,
-   "c": 2294352271
+   "n": 16802,
+   "c": 885367915
   },
   {
    "p": "thugnet/core/rsio.lua",
@@ -368,8 +368,8 @@
   },
   {
    "p": "thugnet/core/updater.lua",
-   "n": 33958,
-   "c": 4244677169
+   "n": 34749,
+   "c": 402499514
   },
   {
    "p": "thugnet/kernel.lua",
@@ -544,7 +544,7 @@
   {
    "p": "thugnet/version.lua",
    "n": 316,
-   "c": 1325428175
+   "c": 1325624784
   }
  ]
 }
