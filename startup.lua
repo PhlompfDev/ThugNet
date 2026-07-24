@@ -112,6 +112,7 @@ end
 if cfg.roles.ui then
     local nav = require("thugnet.ui.nav")
     nav.register(require("thugnet.ui.pages.dashboard"))
+    nav.register(require("thugnet.ui.pages.status"))
     nav.register(require("thugnet.ui.pages.monitoring"))
     nav.register(require("thugnet.ui.pages.domains"))
     nav.register(require("thugnet.ui.pages.events"))
