@@ -28,6 +28,7 @@ function config.exists()
 end
 
 local ROLES = { dns = true, server = true, client = true, ui = true }
+local THEMES = { dark = true, light = true }
 
 -- Validate a defaults-applied config. Defaults are the migration mechanism
 -- (a new optional field can never fail here), so everything this rejects is a
@@ -71,8 +72,8 @@ function config.validate(cfg)
         end
     end
 
-    if cfg.theme ~= "dark" then
-        bad(("unknown theme %q (valid: dark)"):format(tostring(cfg.theme)))
+    if not THEMES[cfg.theme] then
+        bad(("unknown theme %q (valid: dark, light)"):format(tostring(cfg.theme)))
     end
     if type(cfg.text_scale) ~= "number" or cfg.text_scale < 0.5 or cfg.text_scale > 5 then
         bad("text_scale must be a number between 0.5 and 5")

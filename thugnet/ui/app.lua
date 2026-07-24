@@ -10,6 +10,7 @@ local tcd     = require("scada-common.tcd")
 local theme   = require("thugnet.ui.theme")
 local nav     = require("thugnet.ui.nav")
 local widgets = require("thugnet.ui.widgets")
+local kit     = require("thugnet.ui.kit")
 local menus   = require("thugnet.ui.menus")
 
 local app = {}
@@ -159,6 +160,17 @@ local function make_ui_ctx(surface)
         local s = terminal_surface()
         if not s then return end
         tprompt.open(s.target, last_rc.x, last_rc.y, label, initial, on_confirm, suggestions_fn)
+    end
+    -- live theme switch: reassign the active palette, persist it to config, and
+    -- force a full re-clear (themed = {}) so every surface repaints in the new
+    -- palette -- a page switch deliberately skips the clear, but a re-theme must
+    -- not. The Visual settings tab and the wizard's theme step both call this.
+    function ctx.set_theme(name)
+        theme.set(name)
+        C.config.theme = name
+        pcall(function() require("thugnet.config").save(C.config) end)
+        themed = {}
+        app.request_rebuild()
     end
     return ctx
 end
@@ -375,34 +387,22 @@ local function build_terminal_surface(target)
                     text = "\x07 ThugNet", fg_bg = ui.cpair(theme.tokens.accent, theme.tokens.panel) }
         title_x = 16
     end
+    -- the connectivity corner claims the right end of the header; keep the node
+    -- label clear of it (corner_w wide + one column of gap)
+    local corner_w = narrow and 2 or kit.LINK_CORNER_W
     ui.TextBox{ parent = display, x = title_x, y = 1,
-                width = math.max(1, math.min(#C.config.label, w - title_x - 6)),
+                width = math.max(1, math.min(#C.config.label, w - title_x - corner_w - 1)),
                 height = 1, text = C.config.label,
                 fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.panel) }
-    -- top-right DNS heartbeat: pulses between the two greens while the link is
-    -- up, solid red when down, inert when this node neither hosts DNS nor runs
-    -- a client. It mirrors the home page's DNS dot so the two never disagree,
-    -- and reflects a DNS HOST's own service (not only a client's link), which
-    -- the old client-only version missed on a dns-host-only node.
-    local dns_dot = ui.TextBox{ parent = display, x = w - 4, y = 1, width = 3, height = 1,
-                                text = "\x07 ", fg_bg = ui.cpair(theme.tokens.raised, theme.tokens.panel) }
-    local function header_dns_up()
-        if C.dns and (C.config.roles or {}).dns then return C.dns.is_active() == true
-        elseif C.client then return C.client.dns_ok() == true end
-        return nil   -- neither role: not applicable
-    end
-    local hdr_phase = false
-    local function beat_header_dot()
-        hdr_phase = not hdr_phase
-        local up = header_dns_up()
-        if up == nil then dns_dot.recolor(theme.tokens.raised)
-        elseif up then dns_dot.recolor(hdr_phase and theme.tokens.ok_bright or theme.tokens.ok)
-        else dns_dot.recolor(theme.tokens.alert) end
-    end
-    beat_header_dot()
-    if header_dns_up() ~= nil then
-        surface.owned[#surface.owned + 1] = C.kernel.every(1, beat_header_dot)
-    end
+    -- top-right live connectivity corner: DNS + Server heartbeats + a signal
+    -- bar, reading the ACTUAL service state (not static roles), self-beating on
+    -- a 1s timer owned by this surface so teardown cancels it. Replaces the old
+    -- single DNS dot; on a pocket it collapses to one combined dot.
+    kit.link_corner(display, {
+        kernel = C.kernel, config = C.config,
+        dns = C.dns, client = C.client, server = C.server,
+        own = function(h) surface.owned[#surface.owned + 1] = h; return h end,
+    }, w - corner_w, 1, theme)
 
     if nav_open then
         -- the drawer owns the whole body; no content is built behind it
@@ -565,6 +565,10 @@ function app.start(ctx)
     if started then return end
     C = ctx
     started = true
+
+    -- select the persisted theme before the first paint (config.theme defaults
+    -- to "dark"); the Visual tab / wizard switch it live via ctx.set_theme
+    theme.set((ctx.config and ctx.config.theme) or "dark")
 
     -- framework timers (LED blink + delayed flashes); overlays repaint on
     -- top afterwards so animated elements never overwrite them

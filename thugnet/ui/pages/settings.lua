@@ -2,11 +2,12 @@
 -- lives in core/updater.lua and is reached through updater.status().
 local ui = require("graphics.ui")
 local widgets = require("thugnet.ui.widgets")
+local kit = require("thugnet.ui.kit")
 local flasher = require("graphics.flasher")
 local updater = require("thugnet.core.updater")
 local util = require("scada-common.util")
 
-local TABS = { "Updates", "Node", "Roles" }
+local TABS = { "Updates", "Node", "Roles", "Visual" }
 
 return {
     id = "settings",
@@ -480,6 +481,43 @@ return {
                 height = 2, text = "Role changes take effect after a reboot "
                     .. "(Node tab).",
                 fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.bg) }
+
+        elseif view == "Visual" then
+            local cfg = ui_ctx.config
+            local vy = widgets.section(content, 2, y, w - 3, "APPEARANCE", theme)
+
+            ui.TextBox{ parent = content, x = 2, y = vy + 1, width = w - 3, height = 1,
+                text = "Theme", fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.bg) }
+
+            -- Dark/Light selector. set_theme (app.lua) reassigns the palette,
+            -- persists config.theme, and rebuilds every surface in the new look.
+            ui.RadioButton{
+                parent = content, x = 2, y = vy + 2,
+                options = { "Dark", "Light" },
+                radio_colors = ui.cpair(theme.tokens.dim, theme.tokens.raised),
+                select_color = theme.tokens.accent,
+                default = (cfg and cfg.theme == "light") and 2 or 1,
+                callback = function(i)
+                    if ui_ctx.set_theme then
+                        ui_ctx.set_theme(i == 2 and "light" or "dark")
+                    end
+                end,
+            }
+            ui.TextBox{ parent = content, x = 12, y = vy + 2, width = w - 13, height = 1,
+                text = "industrial, low-light",
+                fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.bg) }
+            ui.TextBox{ parent = content, x = 12, y = vy + 3, width = w - 13, height = 1,
+                text = "bright, high-contrast",
+                fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.bg) }
+
+            -- live preview: a few kit atoms in the current theme so the choice
+            -- is visible before leaving the tab
+            local py = vy + 5
+            kit.led_row(content, 2, py, "DNS", theme).set(true)
+            kit.badge(content, 8, py, { on = { "ok", "ONLINE" } }, theme).set("on")
+            widgets.section(content, 2, py + 2, w - 3, "SECTION", theme)
+
+            say("Applies instantly, saved to this node.")
         end
     end,
 }

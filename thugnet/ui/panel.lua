@@ -23,6 +23,7 @@ local panel = {}
 function panel.start(ctx)
     local target = term.current()
     local w, h = target.getSize()
+    theme.set((ctx.config and ctx.config.theme) or "dark")
     theme.apply(target)
 
     local roles = ctx.config.roles or {}

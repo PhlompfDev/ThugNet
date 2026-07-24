@@ -1,10 +1,10 @@
 {
- "version": "2.2.12",
+ "version": "2.2.13",
  "files": [
   {
    "p": "CHANGELOG.md",
-   "n": 4088,
-   "c": 541755998
+   "n": 4870,
+   "c": 2038602193
   },
   {
    "p": "README.md",
@@ -303,8 +303,8 @@
   },
   {
    "p": "thugnet/config.lua",
-   "n": 3056,
-   "c": 591772096
+   "n": 3110,
+   "c": 4059220834
   },
   {
    "p": "thugnet/core/automation.lua",
@@ -413,13 +413,13 @@
   },
   {
    "p": "thugnet/setup.lua",
-   "n": 7404,
-   "c": 1150494456
+   "n": 7813,
+   "c": 2463345728
   },
   {
    "p": "thugnet/ui/app.lua",
-   "n": 29348,
-   "c": 3982963557
+   "n": 29578,
+   "c": 2361820117
   },
   {
    "p": "thugnet/ui/editor/colors.lua",
@@ -445,6 +445,11 @@
    "p": "thugnet/ui/face_editor.lua",
    "n": 8681,
    "c": 634614894
+  },
+  {
+   "p": "thugnet/ui/kit.lua",
+   "n": 11252,
+   "c": 3644203984
   },
   {
    "p": "thugnet/ui/menus.lua",
@@ -523,33 +528,33 @@
   },
   {
    "p": "thugnet/ui/pages/settings.lua",
-   "n": 25586,
-   "c": 376935407
+   "n": 27528,
+   "c": 47886263
   },
   {
    "p": "thugnet/ui/panel.lua",
-   "n": 7134,
-   "c": 1730264277
+   "n": 7193,
+   "c": 574345263
   },
   {
    "p": "thugnet/ui/setup_ui.lua",
-   "n": 9118,
-   "c": 1013640495
+   "n": 14743,
+   "c": 3138255966
   },
   {
    "p": "thugnet/ui/theme.lua",
-   "n": 2215,
-   "c": 1170319989
+   "n": 4251,
+   "c": 1091310596
   },
   {
    "p": "thugnet/ui/widgets.lua",
-   "n": 8315,
-   "c": 1456861371
+   "n": 8306,
+   "c": 2236151445
   },
   {
    "p": "thugnet/version.lua",
    "n": 317,
-   "c": 3174657537
+   "c": 3174854146
   }
  ]
 }

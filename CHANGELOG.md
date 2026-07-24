@@ -3,6 +3,13 @@
 Newest first. The Settings > Updates tab reads this file, showing the
 sections newer than the version a node currently runs.
 
+## v2.2.13
+
+- Fresh coat of paint, with a new industrial "network panel" look inspired by cc-mek-scada.
+- **Light theme.** Settings now has a Visual tab where you can switch between the dark and a new light theme -- it applies instantly and is saved per computer. You can also pick your theme right in the setup wizard.
+- **Redesigned setup wizard.** The first-boot wizard is now a guided flow: a welcome screen, one step at a time with progress dots, a "can't continue until it's filled in" Next button, a theme choice, and a review screen before anything is saved -- no more cramped buttons on small screens.
+- **Live status in the header.** Every screen's top-right corner now shows DNS and Server heartbeat LEDs plus a signal bar, so link health is always visible at a glance.
+
 ## v2.2.12
 
 - One-line install for a fresh computer: run `wget run https://raw.githubusercontent.com/PhlompfDev/ThugNet/main/install.lua` in the terminal and it downloads the whole system (verifying every file) and reboots into the setup wizard -- no more copying the folder in by hand.

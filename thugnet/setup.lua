@@ -41,13 +41,22 @@ end
 -- text_scale and anything future survive a re-provision), reset any
 -- corrupt NON-asked field to its default so the wizard's own validate pass
 -- can't be trapped in a loop, save, and return the loaded, defaults-applied cfg.
----@param answers table { label:string, roles:table, domain?:string }
+local THEMES = { dark = true, light = true }
+
+---@param answers table { label:string, roles:table, domain?:string, theme?:string }
 ---@param existing table|nil the current config, or nil on a fresh node
 ---@return table cfg
 function setup.commit(answers, existing)
     local out = existing or {}
     out.label, out.roles, out.server_domain = answers.label, answers.roles, answers.domain
-    if out.theme ~= "dark" then out.theme = nil end
+    -- theme is an asked field (the wizard's Look step). Take a valid choice;
+    -- otherwise reset a corrupt/absent value to the default (nil -> dark on load).
+    -- The plain-terminal wizard passes no theme, so it always resets to default.
+    if answers.theme and THEMES[answers.theme] then
+        out.theme = answers.theme
+    elseif not THEMES[out.theme] then
+        out.theme = nil
+    end
     if type(out.text_scale) ~= "number"
         or out.text_scale < 0.5 or out.text_scale > 5 then
         out.text_scale = nil

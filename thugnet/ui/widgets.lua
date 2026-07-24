@@ -1,6 +1,9 @@
 -- Composite widgets shared by every page. All colors via theme tokens.
+-- The page-level MOLECULES; the design-system atoms they build on live in
+-- thugnet/ui/kit.lua (card, badge, readout, led_row, signal, ...).
 local ui = require("graphics.ui")
 local flasher = require("graphics.flasher")
+local kit = require("thugnet.ui.kit")
 
 local widgets = {}
 
@@ -76,11 +79,8 @@ end
 ---@param ui_ctx table { theme, own, telemetry_cache }
 function widgets.domain_tile(parent, x, y, w, h, ui_ctx, info)
     local theme = ui_ctx.theme
-    local card = ui.Div{ parent = parent, x = x, y = y, width = w, height = h,
-                         fg_bg = ui.cpair(theme.tokens.text, theme.tokens.panel) }
-    -- paint the card background
-    ui.Tiling{ parent = card, x = 1, y = 1, width = w, height = h,
-               fill_c = ui.cpair(theme.tokens.panel, theme.tokens.panel) }
+    -- the one card implementation (kit.card = the Div + panel-fill Tiling)
+    local card = kit.card(parent, x, y, w, h, theme, { bg = "panel" })
     if info.on_menu then
         -- capture the callback NOW: tile.update() replaces `info` with a
         -- fresh table that carries no on_menu, so reading it through `info`
