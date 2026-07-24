@@ -1,15 +1,15 @@
 {
- "version": "2.2.11",
+ "version": "2.2.12",
  "files": [
   {
    "p": "CHANGELOG.md",
-   "n": 3654,
-   "c": 65990383
+   "n": 4088,
+   "c": 541755998
   },
   {
    "p": "README.md",
-   "n": 8991,
-   "c": 874916200
+   "n": 9587,
+   "c": 2994274004
   },
   {
    "p": "graphics/context_menu.lua",
@@ -260,6 +260,11 @@
    "p": "graphics/ui.lua",
    "n": 16346,
    "c": 555072801
+  },
+  {
+   "p": "install.lua",
+   "n": 5524,
+   "c": 248052531
   },
   {
    "p": "scada-common/constants.lua",
@@ -544,7 +549,7 @@
   {
    "p": "thugnet/version.lua",
    "n": 317,
-   "c": 3174460928
+   "c": 3174657537
   }
  ]
 }

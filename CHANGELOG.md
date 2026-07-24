@@ -3,6 +3,11 @@
 Newest first. The Settings > Updates tab reads this file, showing the
 sections newer than the version a node currently runs.
 
+## v2.2.12
+
+- One-line install for a fresh computer: run `wget run https://raw.githubusercontent.com/PhlompfDev/ThugNet/main/install.lua` in the terminal and it downloads the whole system (verifying every file) and reboots into the setup wizard -- no more copying the folder in by hand.
+- Re-running the installer on an existing computer is a safe repair: it only rewrites program files and never touches your config or saved state.
+
 ## v2.2.11
 
 - The Updates screen no longer shows an empty gray bar when nothing is downloading -- the progress bar now appears only while an update is actually in flight, and there's a bit more breathing room above the Check Now button.

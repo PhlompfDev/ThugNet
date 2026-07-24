@@ -24,6 +24,20 @@ one level up, outside it. Every computer in the fleet runs the same tree; nodes
 differ only by their `config.json`, which is authored on the computer itself —
 never copied in.
 
+**Fastest — one line in the computer's terminal (needs the HTTP API on):**
+
+```
+wget run https://raw.githubusercontent.com/PhlompfDev/ThugNet/main/install.lua
+```
+
+`install.lua` pulls `manifest.json` from the public mirror and downloads every
+file it lists into place, verifying each one's length + checksum (the same
+check the self-updater uses), then reboots into the setup wizard. It only ever
+writes the code files the manifest names, so re-running it on an existing node
+is a safe repair that leaves `config.json` and other runtime state alone.
+
+**Manual — copy the tree in yourself:**
+
 1. Copy the **contents of `deployable/`** onto the computer's root (so
    `startup.lua` sits at the computer's top level). Nothing to pick out — the
    folder is already the exact ship set.
