@@ -7,14 +7,16 @@ local kit = require("thugnet.ui.kit")
 
 local widgets = {}
 
--- section header: accent tick + title + rule to the edge
--- returns next free y inside parent (header takes 1 row)
-function widgets.section(parent, x, y, w, title, theme)
+-- section header: accent tick + optional topic icon + title + rule to the edge.
+-- returns next free y inside parent (header takes 1 row). `icon` is optional and
+-- when omitted the header renders byte-identically to before.
+function widgets.section(parent, x, y, w, title, theme, icon)
     ui.TextBox{ parent = parent, x = x, y = y, width = 1, height = 1, text = "\x95",
                 fg_bg = ui.cpair(theme.tokens.accent, theme.tokens.bg) }
-    ui.TextBox{ parent = parent, x = x + 1, y = y, width = #title + 1, height = 1,
-                text = " " .. title, fg_bg = ui.cpair(theme.tokens.text, theme.tokens.bg) }
-    local rule_x = x + #title + 3
+    local label = " " .. (icon and (icon .. " ") or "") .. title
+    ui.TextBox{ parent = parent, x = x + 1, y = y, width = #label, height = 1,
+                text = label, fg_bg = ui.cpair(theme.tokens.text, theme.tokens.bg) }
+    local rule_x = x + 1 + #label + 1
     if rule_x <= x + w - 1 then
         ui.TextBox{ parent = parent, x = rule_x, y = y, width = (x + w) - rule_x, height = 1,
                     text = string.rep("\x8c", (x + w) - rule_x),

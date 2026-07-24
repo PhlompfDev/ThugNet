@@ -1,10 +1,10 @@
 {
- "version": "2.2.15",
+ "version": "2.2.16",
  "files": [
   {
    "p": "CHANGELOG.md",
-   "n": 5580,
-   "c": 1061982616
+   "n": 5716,
+   "c": 985841334
   },
   {
    "p": "README.md",
@@ -448,8 +448,8 @@
   },
   {
    "p": "thugnet/ui/kit.lua",
-   "n": 11252,
-   "c": 3644203984
+   "n": 11606,
+   "c": 441687278
   },
   {
    "p": "thugnet/ui/menus.lua",
@@ -473,8 +473,8 @@
   },
   {
    "p": "thugnet/ui/pages/dashboard.lua",
-   "n": 6425,
-   "c": 3378909212
+   "n": 6319,
+   "c": 558365675
   },
   {
    "p": "thugnet/ui/pages/displays.lua",
@@ -513,8 +513,8 @@
   },
   {
    "p": "thugnet/ui/pages/sent_requests.lua",
-   "n": 5223,
-   "c": 396601919
+   "n": 5120,
+   "c": 928027431
   },
   {
    "p": "thugnet/ui/pages/server.lua",
@@ -553,13 +553,13 @@
   },
   {
    "p": "thugnet/ui/widgets.lua",
-   "n": 8306,
-   "c": 2236151445
+   "n": 8480,
+   "c": 2130587424
   },
   {
    "p": "thugnet/version.lua",
    "n": 317,
-   "c": 3175247364
+   "c": 3175443973
   }
  ]
 }

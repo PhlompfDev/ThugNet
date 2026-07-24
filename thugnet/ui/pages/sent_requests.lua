@@ -4,6 +4,7 @@
 -- Hidden from the sidebar; reached from the Feature Request page.
 local ui = require("graphics.ui")
 local widgets = require("thugnet.ui.widgets")
+local kit = require("thugnet.ui.kit")
 local requests = require("thugnet.core.requests")
 
 -- status -> theme token. Every legal state/NNN.json status gets an explicit
@@ -52,9 +53,7 @@ return {
             list.remove_all()
             local recs = requests.list()
             if #recs == 0 then
-                ui.TextBox{ parent = list, x = 1, y = 1, width = w - 5, height = 2,
-                    text = "Nothing sent from this node yet.",
-                    fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.bg) }
+                kit.empty(list, nil, "Nothing sent from this node yet.", theme)
             else
                 -- newest first; one row per record, capped at the list height
                 local row = 1

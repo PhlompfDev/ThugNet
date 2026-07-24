@@ -2,6 +2,7 @@
 -- §8 domain context menu per tile.
 local ui = require("graphics.ui")
 local widgets = require("thugnet.ui.widgets")
+local kit = require("thugnet.ui.kit")
 local menus = require("thugnet.ui.menus")
 
 local TILE_W, TILE_H = 24, 4
@@ -87,9 +88,7 @@ return {
             tiles = {}
             local names = ui_ctx.client and ui_ctx.client.get_domains() or {}
             if #names == 0 then
-                ui.TextBox{ parent = grid, x = 2, y = 1, width = w - 4, height = 1,
-                            text = "No domains on the network yet.",
-                            fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.bg) }
+                kit.empty(grid, kit.icons.domain, "No domains on the network yet.", theme)
                 return
             end
             local cols = math.max(1, math.floor((w - 2) / (TILE_W + TILE_GAP)))

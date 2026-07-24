@@ -13,15 +13,20 @@ local kit = {}
 -- Named glyphs so a page writes kit.icons.sensor, never a raw \x07. Values are
 -- CC control-picture characters chosen to render on the standard font; the
 -- meaning is in the name, so a later font/glyph retune happens in one place.
+-- ONLY glyphs that render meaningfully in CC's font (0x00-0x1F are teletext
+-- block graphics, NOT CP437 symbols -- arrows/gears/houses would garble). Safe
+-- set: the bullet \x07, the play/arrow triangles \x10/\x11/\x1a/\x1e, the tick
+-- \x95. Icons are intentionally minimal; the point is a consistent empty/status
+-- vocabulary, not decoration.
 kit.icons = {
-    domain  = "\x07",   -- filled dot
+    domain  = "\x07",   -- filled bullet
     server  = "\x07",
     dns     = "\x07",
-    sensor  = "\x9f",   -- signal-ish block
-    scene   = "\x10",   -- play triangle
+    sensor  = "\x07",
+    scene   = "\x10",   -- play triangle (right)
     rule    = "\x95",   -- tick / rule mark
     ok      = "\x07",
-    warn    = "\x13",   -- caution
+    warn    = "\x1e",   -- up triangle (attention)
     alert   = "!",
 }
 

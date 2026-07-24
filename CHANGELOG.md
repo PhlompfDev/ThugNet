@@ -3,6 +3,10 @@
 Newest first. The Settings > Updates tab reads this file, showing the
 sections newer than the version a node currently runs.
 
+## v2.2.16
+
+- "Nothing here yet" screens (like an empty Home or Sent Requests list) now share one clean, centered look across the app.
+
 ## v2.2.15
 
 - The setup wizard's theme choice now previews instantly as you click Dark or Light, instead of only changing after you finish the wizard.
