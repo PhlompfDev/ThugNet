@@ -3,6 +3,10 @@
 Newest first. The Settings > Updates tab reads this file, showing the
 sections newer than the version a node currently runs.
 
+## v2.2.11
+
+- The Updates screen no longer shows an empty gray bar when nothing is downloading -- the progress bar now appears only while an update is actually in flight, and there's a bit more breathing room above the Check Now button.
+
 ## v2.2.10
 
 - The update screen now shows live progress: the file currently downloading, a fill bar, and how far along the download is -- instead of sitting at 0/x until it finishes.

@@ -13,9 +13,10 @@ return {
     name = "Settings",
     category = "system",
     min_w = 26,
-    -- Updates tab bottoms out at row 15 plus the hint line (request 004's
-    -- padding); anything shorter clips checkboxes instead of refusing
-    min_h = 16,
+    -- Updates tab bottoms out at row 16 plus the hint line (request 004's
+    -- padding, plus one row of padding below the download progress bar);
+    -- anything shorter clips checkboxes instead of refusing
+    min_h = 17,
     requires_role = "ui",
     build = function(content, ui_ctx)
         local theme = ui_ctx.theme
@@ -166,6 +167,9 @@ return {
             render_progress = function()
                 local s = updater.status()
                 if s.state == "downloading" then
+                    -- only occupy the row while a download is actually in
+                    -- flight; idle nodes showed an empty gray bar for no reason
+                    prog_bar.show(); detail_tb.show()
                     local total = s.total or 0
                     prog_bar.set_value(total > 0 and (s.done or 0) / total or 0)
                     local base = s.file and (tostring(s.file):match("[^/]+$")
@@ -184,6 +188,9 @@ return {
                 else
                     prog_bar.set_value(0)
                     detail_tb.set_value("")
+                    -- clear=true redraws the parent so the bar visibly leaves
+                    -- the layout rather than lingering as a gray stripe
+                    prog_bar.hide(true); detail_tb.hide(true)
                 end
             end
             render_progress()
@@ -212,8 +219,10 @@ return {
                 if progress_watch then progress_watch.cancel() end
             end })
 
+            -- y+5 is left blank as padding so "Check Now" never butts up
+            -- against the download progress bar (y+4) when it is visible
             ui.PushButton{
-                parent = content, x = 2, y = y + 5, width = 13, text = "Check Now",
+                parent = content, x = 2, y = y + 6, width = 13, text = "Check Now",
                 fg_bg = ui.cpair(theme.tokens.text, theme.tokens.raised),
                 active_fg_bg = ui.cpair(theme.tokens.bg, theme.tokens.accent),
                 callback = function()
@@ -231,7 +240,7 @@ return {
             }
 
             ui.PushButton{
-                parent = content, x = 17, y = y + 5, width = 14, text = "What's New",
+                parent = content, x = 17, y = y + 6, width = 14, text = "What's New",
                 fg_bg = ui.cpair(theme.tokens.text, theme.tokens.raised),
                 active_fg_bg = ui.cpair(theme.tokens.bg, theme.tokens.accent),
                 callback = function()
@@ -274,7 +283,7 @@ return {
             -- the agent loop watches -- and this updater carries the result
             -- back to every node once the owner merges and publishes.
             ui.PushButton{
-                parent = content, x = 2, y = y + 7, width = 17,
+                parent = content, x = 2, y = y + 8, width = 17,
                 text = "Feature Request",
                 fg_bg = ui.cpair(theme.tokens.text, theme.tokens.raised),
                 active_fg_bg = ui.cpair(theme.tokens.bg, theme.tokens.accent),
@@ -282,14 +291,14 @@ return {
             }
 
             ui.Checkbox{
-                parent = content, x = 2, y = y + 9, label = "Notify me about updates",
+                parent = content, x = 2, y = y + 10, label = "Notify me about updates",
                 box_fg_bg = ui.cpair(theme.tokens.accent, theme.tokens.raised),
                 fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.bg),
                 default = bus.get("update_notify") ~= false,
                 callback = function(v) bus.set("update_notify", v, { persist = true }) end,
             }
             ui.Checkbox{
-                parent = content, x = 2, y = y + 10,
+                parent = content, x = 2, y = y + 11,
                 label = "Auto-install and reboot when idle",
                 box_fg_bg = ui.cpair(theme.tokens.accent, theme.tokens.raised),
                 fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.bg),

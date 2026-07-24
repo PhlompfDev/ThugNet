@@ -1,10 +1,10 @@
 {
- "version": "2.2.10",
+ "version": "2.2.11",
  "files": [
   {
    "p": "CHANGELOG.md",
-   "n": 3416,
-   "c": 599432267
+   "n": 3654,
+   "c": 65990383
   },
   {
    "p": "README.md",
@@ -518,8 +518,8 @@
   },
   {
    "p": "thugnet/ui/pages/settings.lua",
-   "n": 24949,
-   "c": 3245135525
+   "n": 25586,
+   "c": 376935407
   },
   {
    "p": "thugnet/ui/panel.lua",
@@ -544,7 +544,7 @@
   {
    "p": "thugnet/version.lua",
    "n": 317,
-   "c": 3174264319
+   "c": 3174460928
   }
  ]
 }
