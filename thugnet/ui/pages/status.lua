@@ -18,9 +18,10 @@ return {
     name = "Status",
     category = "overview",
     min_w = 26,
-    -- SYSTEM header + 5 rows, NETWORK header + 1, DOMAINS header + >=1, and the
-    -- asset line on the last row: bottoms out around row 13, so refuse below 14
-    min_h = 14,
+    -- SYSTEM header + 5 rows, blank, NETWORK header + blank + LEDs, blank,
+    -- DOMAINS header + >=1 roster row, and the asset line on the last row:
+    -- bottoms out around row 13, so refuse below 15 (leaves a roster row)
+    min_h = 15,
     requires_role = "ui",
     build = function(content, ui_ctx)
         local theme = ui_ctx.theme
@@ -40,10 +41,13 @@ return {
             .set(#role_names > 0 and table.concat(role_names, ", ") or "none")
 
         -- ── NETWORK (heartbeats) ──────────────────────────────────────────
+        -- one blank row below the readouts, then the header, then the LEDs one
+        -- row under it -- so the DNS/Server dots aren't sandwiched against the
+        -- section rules above and below (no signal bar here: the LEDs already
+        -- carry link state, and the bar read as messy "stairs" on a page)
         local ny = widgets.section(content, 2, y + 6, w - 2, "NETWORK", theme)
-        local dns_led = kit.led_row(content, 2, ny, "DNS", theme)
-        local srv_led = kit.led_row(content, 12, ny, "Server", theme)
-        local sig = kit.signal(content, math.max(22, w - 4), ny, theme)
+        local dns_led = kit.led_row(content, 2, ny + 1, "DNS", theme)
+        local srv_led = kit.led_row(content, 14, ny + 1, "Server", theme)
 
         local function dns_state()
             if ui_ctx.dns and roles.dns then return ui_ctx.dns.is_active() and "up" or "down"
@@ -62,7 +66,8 @@ return {
         end
 
         -- ── DOMAINS (roster) ──────────────────────────────────────────────
-        local dy = widgets.section(content, 2, y + 8, w - 2, "DOMAINS", theme)
+        -- a blank row below the NETWORK LEDs, then the header
+        local dy = widgets.section(content, 2, ny + 3, w - 2, "DOMAINS", theme)
         local roster = {}
         local function alive(d)
             if ui_ctx.dns and roles.dns then return ui_ctx.dns.is_alive(d) == true
@@ -107,10 +112,8 @@ return {
         local phase = false
         local function beat()
             phase = not phase
-            local ds = dns_state()
-            beat_led(dns_led, ds, phase)
+            beat_led(dns_led, dns_state(), phase)
             beat_led(srv_led, srv_state(), phase)
-            sig.set(ds == "up" and 3 or (ds == "down" and 0 or 1))
             up_ro.set(fmt_uptime())
             for d, led in pairs(roster_leds) do
                 beat_led(led, alive(d) and "up" or "down", phase)

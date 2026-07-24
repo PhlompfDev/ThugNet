@@ -98,13 +98,21 @@ end
 
 -- apply the ACTIVE palette to a terminal/monitor target
 function theme.apply(target)
-    for slot, hex in pairs(theme.palette) do
-        target.setPaletteColor(slot, hex)
-    end
+    theme.repalette(target)
     target.setTextColor(theme.tokens.text)
     target.setBackgroundColor(theme.tokens.bg)
     target.clear()
     target.setCursorPos(1, 1)
+end
+
+-- Re-tint the palette slots WITHOUT clearing. CC palette slots are indexed, so
+-- reassigning a slot's hex recolors every cell already using it -- the whole
+-- surface changes theme live, with no redraw and no flicker. The wizard's Look
+-- step uses this to preview the theme the instant it is picked.
+function theme.repalette(target)
+    for slot, hex in pairs(theme.palette) do
+        target.setPaletteColor(slot, hex)
+    end
 end
 
 return theme

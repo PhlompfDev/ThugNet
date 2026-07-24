@@ -108,7 +108,13 @@ function setup_ui.build(display, ctx, on_done)
         options = { "Dark", "Light" },
         radio_colors = ui.cpair(theme.tokens.dim, theme.tokens.raised),
         select_color = theme.tokens.accent,
-        default = (existing.theme == "light") and 2 or 1 }
+        default = (existing.theme == "light") and 2 or 1,
+        -- preview live: re-tint the palette so the whole wizard recolors the
+        -- instant a theme is picked, instead of only after the wizard exits
+        callback = function(i)
+            theme.set(i == 2 and "light" or "dark")
+            theme.repalette(display.window())
+        end }
     ui.TextBox{ parent = p_visual, x = 12, y = 4, width = w - 13, height = 1,
         text = "industrial, low-light", fg_bg = ui.cpair(theme.tokens.dim, theme.tokens.bg) }
     ui.TextBox{ parent = p_visual, x = 12, y = 5, width = w - 13, height = 1,

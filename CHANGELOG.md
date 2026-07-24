@@ -3,6 +3,11 @@
 Newest first. The Settings > Updates tab reads this file, showing the
 sections newer than the version a node currently runs.
 
+## v2.2.15
+
+- The setup wizard's theme choice now previews instantly as you click Dark or Light, instead of only changing after you finish the wizard.
+- Tidied the Status page: removed the cluttered signal bars and gave the DNS and Server status lights more breathing room so they no longer crowd the section dividers.
+
 ## v2.2.14
 
 - **New Status page.** A dedicated diagnostics screen (in the sidebar under the home area) shows your node at a glance: name/ID/version/uptime, live DNS and Server heartbeat LEDs with a signal bar, and a roster of every domain on the network -- each pulsing green when alive, solid red when down -- plus a firmware/network/serial line, styled like an industrial network panel.
